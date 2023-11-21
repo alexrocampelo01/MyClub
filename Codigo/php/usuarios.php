@@ -41,11 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
             }else if($datos->tipeRol == "socios"){
+                crearSocio($datas);
                 // echo" \n crear socio";
-            }else if ($datos->tipeRol == "padres"){
-                echo" \n crear padres";
             }else if ($datos->tipeRol == "monitor"){
-                echo" \n crear monitor";
+                crearMonitor($datos);
+                 echo" \n crear monitor";
             }else if ($datos->tipeRol == "director"){
                 crearDirector($datos);
                 // echo" \n crear director";
@@ -82,6 +82,7 @@ function login($datos){
             
         } 
     }catch (mysqli_sql_exception $e) {
+        echo $e;
         header("HTTP/1.1 404 Not Found");
     }
 }
@@ -132,6 +133,66 @@ function crearDirector($datos){
             $con->query($sql);
             header("HTTP/1.1 201 Created");
             echo json_encode($con->insert_id);
+
+        }catch (mysqli_sql_exception $e) {
+            header("HTTP/1.1 404 Not Found");
+        }
+    }else {
+        header("HTTP/1.1 401 Unauthorized");
+        echo "otro usarios $datos->tipo_user";
+    }
+}
+function crearMonitor($datos){
+    $con = new Conexion();
+    if(checkDirector()){
+        try {
+            // Object { id_u: 28, id_d: 1, nom_m: "monitor", apel1_m: "monitor", apel2_m: "monitor", tlf_m: "222333444", curso_m: "4ºepo", carne_conducir: "1", titulo_monitor: "0" }
+            $id_u = $datos->id_u;
+            $id_d = $datos->id_d;
+            $nom_m = $datos->nom_m;
+            $apel1_m = $datos->apel1_m;
+            $apel2_m = $datos->apel2_m;
+            $tlf_m = $datos->tlf_m;
+            $curso_m = $datos->curso_m;
+            $gmail_m = $datos->gmail_m;
+            $carne_conducir = $datos->carne_conducir;
+            $titulo_monitor = $datos->titulo_monitor;
+    
+            $sql = "INSERT INTO `monitor` INSERT INTO `monitor` (`id_m`, `id_u`, `id_d`, `nom_m`, `apel1_m`, `apel2_m`, `tlf_m`, `curso_m`, `gmail_m`, `carne_conducir`, `titulo_monitor`) 
+                    VALUES (NULL, '$id_u', '$id_d', '$nom_m', '$apel1_m', '$apel2_m', '$tlf_m', '$curso_m', '$gmail_m', '$carne_conducir', '$titulo_monitor');";
+    
+            $con->query($sql);
+            header("HTTP/1.1 201 Created");
+            echo json_encode($con->insert_id);
+    
+        } catch (mysqli_sql_exception $e) {
+            header("HTTP/1.1 404 Not Found");
+        }
+    
+    }else {
+        header("HTTP/1.1 401 Unauthorized");
+        echo "otro usarios $datos->tipo_user";
+    }
+}
+function crearSocio($datos){
+    $con = new Conexion();
+    if(checkDirector()){
+        try{
+
+
+        }catch (mysqli_sql_exception $e) {
+            header("HTTP/1.1 404 Not Found");
+        }
+    }else {
+        header("HTTP/1.1 401 Unauthorized");
+        echo "otro usarios $datos->tipo_user";
+    }
+}
+function crearFamiliar($datos){
+    $con = new Conexion();
+    if(checkDirector()){
+        try{
+
 
         }catch (mysqli_sql_exception $e) {
             header("HTTP/1.1 404 Not Found");
