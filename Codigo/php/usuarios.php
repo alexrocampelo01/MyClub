@@ -8,23 +8,42 @@ require_once('conet.php');
 $con = new Conexion();
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-    echo "esto es un get";
-    try {
-        $sql = "SELECT * FROM usuario WHERE 1";
-        $result = $con->query($sql);
-        //comprovamos que alla resultado
-        // if($result->num_rows == 0 ){
-            //     header("HTTP/1.1 406 Not Acceptable");
-            // }else{
-            // }
-            $usuario = $result->fetch_all(MYSQLI_ASSOC);
-            print_r($sql);
-            echo json_encode($usuario);
+    // echo "esto es un get";
+    if(isset($_GET['lista'])){
+        $lista = $_GET['lista'];
+        echo $lista;
+        switch($lista){
+            case 'directores':
+                echo "lista de directores";
+                break;
+            case 'monitores':
+                echo "lista de monitores";
+                break;
+            case 'socios':
+                echo "lista de socios";
+                listaSocios();
+                break;
+            case 'familiares':
+                echo "lista de socios";
+                break;
         }
-        catch (mysqli_sql_exception $e) {
-            header("HTTP/1.1 404 Not Found");
-        }
-    exit;
+    }
+    // try {
+    //     $sql = "SELECT * FROM usuario WHERE 1";
+    //     $result = $con->query($sql);
+    //     //comprovamos que alla resultado
+    //     // if($result->num_rows == 0 ){
+    //         //     header("HTTP/1.1 406 Not Acceptable");
+    //         // }else{
+    //         // }
+    //         $usuario = $result->fetch_all(MYSQLI_ASSOC);
+    //         print_r($sql);
+    //         echo json_encode($usuario);
+    //     }
+    //     catch (mysqli_sql_exception $e) {
+    //         header("HTTP/1.1 404 Not Found");
+    //     }
+    // exit;
 }
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $json = file_get_contents('php://input');
@@ -41,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
             }else if($datos->tipeRol == "socios"){
-                crearSocio($datas);
+                crearSocio($datos);
                 // echo" \n crear socio";
             }else if ($datos->tipeRol == "monitor"){
                 crearMonitor($datos);
@@ -126,10 +145,11 @@ function crearDirector($datos){
             $nom_d = $datos -> nom_d;
             $apel1_d = $datos -> apel1_d;
             $apel2_d = $datos -> apel2_d;
+            $gmail_d = $datos -> gmail_d;
             $club = $datos -> club;
             $fecha_elec = $datos -> fecha_elec;
-            $sql = "INSERT INTO `director` (`id_d`, `id_u`, `nom_d`, `apel1_d`, `apel2_d`, `club`, `fecha_eleccion`)
-                    VALUES (NULL, '$id_u', '$nom_d', '$apel1_d', '$apel2_d', '$club', '$fecha_elec');";
+            $sql = "INSERT INTO `director` (`id_d`, `id_u`, `nom_d`, `apel1_d`, `apel2_d`, `gmail_d`, `club`, `fecha_eleccion`)
+                    VALUES (NULL, '$id_u', '$nom_d', '$apel1_d', '$apel2_d', '$gmail_d', '$club', '$fecha_elec');";
             $con->query($sql);
             header("HTTP/1.1 201 Created");
             echo json_encode($con->insert_id);
@@ -177,9 +197,38 @@ function crearMonitor($datos){
 function crearSocio($datos){
     $con = new Conexion();
     if(checkDirector()){
-        try{
+        try {
+            // Object { id_u: 30, curso_s: "4ºepo", nom_s: "socio", apel1_s: "socio", apel2_s: "socio", fechNac: "2023-11-21", tlf_s: NULL, colegio: "teresianas", fecha_inscrip: "2023-11-22", observacines: "ninguna" }
+            $id_u = $datos->id_u;
+            $curso_s = $datos->curso_s;
+            $nom_s = $datos->nom_s;
+            $apel1_s = $datos->apel1_s;
+            $apel2_s = $datos->apel2_s;
+            $fechNac = $datos->fechNac;
+            $tlf_s = $datos->tlf_s;
+            $colegio = $datos->colegio;
+            $fecha_inscrip = $datos->fecha_inscrip;
+            $observacines = $datos->observacines;
+            $familiares = $datos->familiares;
+            if(isset($familiares)){
+                // print_r($familiares);
+                if(count($familiares) == 0){
+                    header("HTTP/1.1 500 Internal Server Error");
+                    echo "no hay familiares";
+                    exit;
+                }else{
+                    foreach($familiares as $familiar){
+                        crearFamiliar($familiar);
+                    }
+                }
+            }
+            $sql = "INSERT INTO `socios` (`id_s`, `id_u`, `curso_s`, `nom_s`, `apel1_s`, `apel2_s`, `fechNac`, `tlf_s`, `colegio`, `fecha_inscrip`, `observacines`)
+                    VALUES (NULL, '$id_u', '$curso_s', '$nom_s', '$apel1_s', '$apel2_s', '$fechNac', $tlf_s, '$colegio', '$fecha_inscrip', '$observacines');";
 
-
+            $con->query($sql);
+            header("HTTP/1.1 201 Created");
+            echo json_encode($con->insert_id);
+    
         }catch (mysqli_sql_exception $e) {
             header("HTTP/1.1 404 Not Found");
         }
@@ -191,15 +240,72 @@ function crearSocio($datos){
 function crearFamiliar($datos){
     $con = new Conexion();
     if(checkDirector()){
-        try{
-
-
+        try {
+            // Object { id_u: 2, nom_f: "familar", apel1_f: "familiar", apel2_f: "familiar", tlf_f: "444555666", direccion: "republica argentina 2d", localidad: "leon", cp: "24007", parentesco: "familiar", gmail_f: "familiar@gmail.com", id_s: "2" }
+            $id_u = $datos->id_u;
+            $nom_f = $datos->nom_f;
+            $apel1_f = $datos->apel1_f;
+            $apel2_f = $datos->apel2_f;
+            $tlf_f = $datos->tlf_f;
+            $direccion = $datos->direccion;
+            $localidad = $datos->localidad;
+            $cp = $datos->cp;
+            $parentesco = $datos->parentesco;
+            $gmail_f = $datos->gmail_f;
+            $id_s = $datos->id_s;
+    
+            $sql = "INSERT INTO `familiar` (`id_f`, `id_u`, `nom_f`, `apel1_f`, `apel2_f`, `tlf_f`, `direccion`, `localidad`, `cp`, `parentesco`, `gmail_f`, `id_s`)
+                    VALUES (NULL, '$id_u', '$nom_f', '$apel1_f', '$apel2_f', '$tlf_f', '$direccion', '$localidad', '$cp', '$parentesco', '$gmail_f', '$id_s');";
+    
+            $con->query($sql);
+            header("HTTP/1.1 201 Created");
+            echo json_encode($con->insert_id);
+            return $con->insert_id;
+    
         }catch (mysqli_sql_exception $e) {
             header("HTTP/1.1 404 Not Found");
         }
     }else {
         header("HTTP/1.1 401 Unauthorized");
         echo "otro usarios $datos->tipo_user";
+    }
+}
+
+// consultas para consultar y sacar listas de los usarios
+function listaSocios(){
+    $con = new Conexion();
+    if(checkDirector() || checkMonitor()){
+        // SELECT * FROM familiar WHERE id_s = 2; 
+        try{
+            $sql = "SELECT * FROM `socios` WHERE 1";
+            $result = $con->query($sql);
+            $socios = $result->fetch_all(MYSQLI_ASSOC);
+            echo json_encode($socios);
+        }catch (mysqli_sql_exception $e) {
+            header("HTTP/1.1 404 Not Found");
+        }
+    }
+}
+function familiaresDelSocio($id_s){
+    $con = new Conexion();
+    if(checkDirector() || checkMonitor() ){
+        // SELECT * FROM familiar WHERE id_s = 2; 
+        try{
+            if(isset($id_s)){
+                $sql = "SELECT * FROM familiar WHERE id_s = $id_s;";
+                $result = $con->query($sql);
+                $familiares = $result->fetch_all(MYSQLI_ASSOC);
+                echo json_encode($familiares); 
+            }
+            else{
+                $sql = "INSERT INTO `usuario` (`id_u`, `nom_usu`, `pass_usu`, `tipo_user`) VALUES (NULL, '$nomUsu', '$hashPass', '$tipo_user');";
+                $con->query($sql);
+                header("HTTP/1.1 201 Created");
+                echo json_encode($con->insert_id);
+            } 
+        }catch (mysqli_sql_exception $e) {
+            header("HTTP/1.1 404 Not Found");
+        }
     }
 }
 ?>
