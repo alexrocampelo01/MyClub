@@ -11,20 +11,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     // echo "esto es un get";
     if(isset($_GET['lista'])){
         $lista = $_GET['lista'];
-        echo $lista;
+        // echo $lista;
         switch($lista){
             case 'directores':
                 echo "lista de directores";
                 break;
             case 'monitores':
-                echo "lista de monitores";
+                // echo "lista de monitores";
+                listaMonitores();
                 break;
             case 'socios':
-                echo "lista de socios";
-                listaSocios();
+                // echo "lista de socios";
+                if(isset($_GET['id_socio'])){
+                    // echo $_GET['id_socio'];
+                    listaSocios($_GET['id_socio']);
+                }else{
+
+                    listaSocios();
+                }
                 break;
             case 'familiares':
                 echo "lista de socios";
+                break;
+            case 'responsable':
+                echo "lista de responsable";
+                responsableMonitor();
                 break;
         }
     }
@@ -64,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // echo" \n crear socio";
             }else if ($datos->tipeRol == "monitor"){
                 crearMonitor($datos);
-                 echo" \n crear monitor";
+                //  echo" \n crear monitor";
             }else if ($datos->tipeRol == "director"){
                 crearDirector($datos);
                 // echo" \n crear director";
@@ -178,9 +189,9 @@ function crearMonitor($datos){
             $carne_conducir = $datos->carne_conducir;
             $titulo_monitor = $datos->titulo_monitor;
     
-            $sql = "INSERT INTO `monitor` INSERT INTO `monitor` (`id_m`, `id_u`, `id_d`, `nom_m`, `apel1_m`, `apel2_m`, `tlf_m`, `curso_m`, `gmail_m`, `carne_conducir`, `titulo_monitor`) 
+            $sql = "INSERT INTO `monitor` (`id_m`, `id_u`, `id_d`, `nom_m`, `apel1_m`, `apel2_m`, `tlf_m`, `curso_m`, `gmail_m`, `carne_conducir`, `titulo_monitor`) 
                     VALUES (NULL, '$id_u', '$id_d', '$nom_m', '$apel1_m', '$apel2_m', '$tlf_m', '$curso_m', '$gmail_m', '$carne_conducir', '$titulo_monitor');";
-    
+            // echo $sql;
             $con->query($sql);
             header("HTTP/1.1 201 Created");
             echo json_encode($con->insert_id);
@@ -272,15 +283,69 @@ function crearFamiliar($datos){
 }
 
 // consultas para consultar y sacar listas de los usarios
-function listaSocios(){
+function listaSocios($id_s = 0){
     $con = new Conexion();
     if(checkDirector() || checkMonitor()){
         // SELECT * FROM familiar WHERE id_s = 2; 
         try{
-            $sql = "SELECT * FROM `socios` WHERE 1";
+            // echo "ID DEL USUARIO $id_s";
+            // $sql = "SELECT * FROM `socios` WHERE 1";
+            if($id_s > 0){
+                $sql = "SELECT * FROM `socios` WHERE 1 AND id_s = $id_s";
+            }else{
+                $sql = "SELECT * FROM `socios` WHERE 1";
+            }
+            // echo $sql;
             $result = $con->query($sql);
             $socios = $result->fetch_all(MYSQLI_ASSOC);
             echo json_encode($socios);
+        }catch (mysqli_sql_exception $e) {
+            header("HTTP/1.1 404 Not Found");
+        }
+    }
+}
+function listaMonitores(){
+    $con = new Conexion();
+    echo "lista de monitores";
+    if(isset($_GET['id_monitor'])){
+        $id_m = $_GET['id_monitor'];
+        // echo "filtro por id = $id_m";
+        $sql = "SELECT * FROM `monitor` WHERE 1 and id_m = $id_m;";
+    }else if(isset($_GET['curso'])){
+        $curso = $_GET['curso'];
+        // echo "filtro por curso = $curso";
+        $sql = "SELECT * FROM `monitor` WHERE 1 and curso_m like '$curso'";
+    }else{
+        $sql = "SELECT * FROM `monitor` WHERE 1";
+    }
+
+    if(checkDirector() || checkMonitor()){
+        // SELECT * FROM familiar WHERE id_s = 2; 
+        // echo "hola";
+        try{
+            echo $sql;
+            $result = $con->query($sql);
+            // print_r($result);
+            $monitores = $result->fetch_all(MYSQLI_ASSOC);
+            echo json_encode($monitores);
+        }catch (mysqli_sql_exception $e) {
+            header("HTTP/1.1 404 Not Found");
+        }
+    }
+}
+function responsableMonitor(){
+    $con = new Conexion();
+    // SELECT nom_d, apel1_d, apel2_d FROM monitor INNER JOIN director on monitor.id_d = director.id_d;
+    if(checkDirector() || checkMonitor()){
+        // SELECT * FROM familiar WHERE id_s = 2; 
+        // echo "hola";
+        try{
+            // echo $sql;
+            $sql = "SELECT nom_d, apel1_d, apel2_d FROM monitor INNER JOIN director on monitor.id_d = director.id_d";
+            $result = $con->query($sql);
+            // print_r($result);
+            $responsable = $result->fetch_all(MYSQLI_ASSOC);
+            echo json_encode($responsable);
         }catch (mysqli_sql_exception $e) {
             header("HTTP/1.1 404 Not Found");
         }
@@ -308,4 +373,5 @@ function familiaresDelSocio($id_s){
         }
     }
 }
+
 ?>
