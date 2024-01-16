@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
                 }
                 break;
             case 'familiares':
+                familiaresDelSocio($_GET['id_socio']);
                 echo "lista de socios";
                 break;
             case 'responsable':
@@ -88,6 +89,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
     exit;
+}
+if ($_SERVER['REQUEST_METHOD'] == 'PUT'){
+    $json = file_get_contents('php://input');
+    $datos = json_decode($json);
+    if ($datos === null) {
+        echo "JSON no valido";
+        header("HTTP/1.1 406 Not Acceptable");
+    }else{
+    
+    echo 'put';
 }
 
 function login($datos){
@@ -297,20 +308,34 @@ function listaDirectores($id_d = 0){
         }catch (mysqli_sql_exception $e) {
             header("HTTP/1.1 404 Not Found");
         }
+    }else {
+        header("HTTP/1.1 401 Unauthorized");
+        echo "otro usarios $datos->tipo_user";
     }
 }
 function listaSocios($id_s = 0){
     $con = new Conexion();
     if(checkDirector() || checkMonitor()){
         // SELECT * FROM familiar WHERE id_s = 2; 
+        if(isset($_GET['id_socio'])){
+            $id_s = $_GET['id_socio'];
+            $sql = "SELECT * FROM `socios` WHERE 1 AND id_s = $id_s";
+        }else if(isset($_GET['curso'])){
+            $curso = $_GET['curso'];
+            $sql = "SELECT * FROM `socios` WHERE 1 AND socios.curso_s LIKE '$curso'";
+        }else{
+            $sql = "SELECT * FROM `socios` WHERE 1";
+        }
         try{
-            // echo "ID DEL USUARIO $id_s";
-            // $sql = "SELECT * FROM `socios` WHERE 1";
-            if($id_s > 0){
-                $sql = "SELECT * FROM `socios` WHERE 1 AND id_s = $id_s";
-            }else{
-                $sql = "SELECT * FROM `socios` WHERE 1";
-            }
+            // // echo "ID DEL USUARIO $id_s";
+            // // $sql = "SELECT * FROM `socios` WHERE 1";
+            // if($id_s > 0){
+            //     $sql = "SELECT * FROM `socios` WHERE 1 AND id_s = $id_s";
+            // }else if($curso_s == ""){
+            //     $sql = "SELECT * FROM `socios` WHERE 1 AND socios.curso_s LIKE '4epo'";
+            // }else{
+            //     $sql = "SELECT * FROM `socios` WHERE 1";
+            // }
             // echo $sql;
             $result = $con->query($sql);
             $socios = $result->fetch_all(MYSQLI_ASSOC);
@@ -333,8 +358,7 @@ function listaMonitores(){
     }
 
     if(checkDirector() || checkMonitor()){
-        // SELECT * FROM familiar WHERE id_s = 2; 
-        // echo "hola";
+
         try{
             echo $sql;
             $result = $con->query($sql);
@@ -342,8 +366,10 @@ function listaMonitores(){
             $monitores = $result->fetch_all(MYSQLI_ASSOC);
             echo json_encode($monitores);
         }catch (mysqli_sql_exception $e) {
-            header("HTTP/1.1 404 Not Found");
+            header("HTTP/1.1 406 Not Acceptable");
         }
+    }else{
+        header("HTTP/1.1 401 Unauthorized");
     }
 }
 function responsableMonitor(){
@@ -360,14 +386,16 @@ function responsableMonitor(){
                 $responsable = $result->fetch_all(MYSQLI_ASSOC);
                 echo json_encode($responsable);
             }catch (mysqli_sql_exception $e) {
-                header("HTTP/1.1 404 Not Found");
+                header("HTTP/1.1 402 Payment Required");
             }
+        }else{
+            header("HTTP/1.1 401 Unauthorized");
         }
     }else{
-        header("HTTP/1.1 500 Internal Server Error");
+        header("HTTP/1.1 406 Not Acceptable");
     }
 }
-function familiaresDelSocio($id_s){
+function familiaresDelSocio($id_s = 0){
     $con = new Conexion();
     if(checkDirector() || checkMonitor() ){
         // SELECT * FROM familiar WHERE id_s = 2; 
@@ -377,15 +405,12 @@ function familiaresDelSocio($id_s){
                 $result = $con->query($sql);
                 $familiares = $result->fetch_all(MYSQLI_ASSOC);
                 echo json_encode($familiares); 
+            }else{
+                header("HTTP/1.1 402 Payment Required");
             }
-            else{
-                $sql = "INSERT INTO `usuario` (`id_u`, `nom_usu`, `pass_usu`, `tipo_user`) VALUES (NULL, '$nomUsu', '$hashPass', '$tipo_user');";
-                $con->query($sql);
-                header("HTTP/1.1 201 Created");
-                echo json_encode($con->insert_id);
-            } 
         }catch (mysqli_sql_exception $e) {
-            header("HTTP/1.1 404 Not Found");
+            header("HTTP/1.1 406 Not Acceptable");
+            // header("HTTP/1.1 404 Not Found");
         }
     }
 }
