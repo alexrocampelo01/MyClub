@@ -68,7 +68,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 //echo "\n crear usuario";
                 crearUsuario($datos);
 
-
             }else if($datos->tipeRol == "socios"){
                 crearSocio($datos);
                 // echo" \n crear socio";
@@ -97,8 +96,68 @@ if ($_SERVER['REQUEST_METHOD'] == 'PUT'){
         echo "JSON no valido";
         header("HTTP/1.1 406 Not Acceptable");
     }else{
-    
-    echo 'put';
+        if(checkMonitor() || checkDirector()){
+            if(isset($datos->tipeRol)){
+                if($datos->tipeRol == "socios"){
+                    modificarSocio($datos);
+                    // echo" \n crear socio";
+                }else if ($datos->tipeRol == "monitor"){
+                    modificarMonitor($datos);
+                    //  echo" \n crear monitor";
+                }else if ($datos->tipeRol == "director"){
+                    modificarDirector($datos);
+                    // echo" \n crear director";
+                }else if ($datos->tipeRol == "familiar"){
+                    modificarFamiliar($datos);
+                }else{
+                    echo" \n formulario no registrado";
+                }
+            
+        }else {
+            header("HTTP/1.1 401 Unauthorized");
+            echo "Usuario no autorizado";
+        }
+        }
+    }
+}
+if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
+    if(checkDirector()){
+        if(isset($_GET['id'] )&& isset($_GET['tipo_user'])){
+            $tipo_user = $_GET['tipo_user'];
+            $id= $_GET['id'];
+            echo $id;
+            echo $tipo_user;
+            switch($tipo_user){
+                case 'director':
+                    $sql = "DELETE FROM `director` WHERE `director`.`id_d` = '$id'";
+                    break;
+                case 'monitor':
+                    $sql = "DELETE FROM monitor WHERE `monitor`.`id_m` = '$id'";
+                    break;
+                case 'socios':
+                    $sql = "DELETE FROM socios WHERE `socios`.`id_s` = '$id'";
+                    break;
+                case 'familiares':
+                    $sql = "DELETE FROM `familiar` WHERE `familiar`.`id_f` = '$id'";
+                    break;
+                case 'usuarios':
+                    $sql = "DELETE FROM usuario WHERE `usuario`.`id_u` = '$id'";
+                    break;
+                default:
+                    echo 'form incorrecto';
+                    break;
+            }
+            if(isset($sql)){
+                $con->query($sql);
+                header("HTTP/1.1 201 Created");
+            }else{
+                echo 'form incorrecto';
+            }
+        }
+    }else {
+        header("HTTP/1.1 401 Unauthorized");
+        echo "otro usarios $datos->tipo_user";
+    }
 }
 
 function login($datos){
@@ -274,9 +333,9 @@ function crearFamiliar($datos){
             $gmail_f = $datos->gmail_f;
             $id_s = $datos->id_s;
     
-            $sql = "INSERT INTO `familiar` (`id_f`, `id_u`, `nom_f`, `apel1_f`, `apel2_f`, `tlf_f`, `direccion`, `localidad`, `cp`, `parentesco`, `gmail_f`, `id_s`)
-                    VALUES (NULL, '$id_u', '$nom_f', '$apel1_f', '$apel2_f', '$tlf_f', '$direccion', '$localidad', '$cp', '$parentesco', '$gmail_f', '$id_s');";
-    
+            $sql = "INSERT INTO `familiar` (`id_u`, `nom_f`, `apel1_f`, `apel2_f`, `tlf_f`, `direccion`, `localidad`, `cp`, `parentesco`, `gmail_f`, `id_s`)
+                    VALUES ('$id_u', '$nom_f', '$apel1_f', '$apel2_f', '$tlf_f', '$direccion', '$localidad', '$cp', '$parentesco', '$gmail_f', '$id_s');";
+            // echo $sql;
             $con->query($sql);
             header("HTTP/1.1 201 Created");
             echo json_encode($con->insert_id);
@@ -414,5 +473,194 @@ function familiaresDelSocio($id_s = 0){
         }
     }
 }
+// - Modificar
+function modificarUsuario($datos){
+    $con = new Conexion();
+    //echo "$permisos";
+    if(checkDirector()){
+        try {
+            $nomUsu = $datos->nom_usu;
+            $passUsu = $datos->pass_usu;
+            $hashPass = hash('sha512', $passUsu);
+            $sql = "SELECT * FROM `usuario` WHERE 1 AND nom_usu LIKE '$nomUsu';";
+            $result = $con->query($sql);
+            // comprovamos que alla resultado
+            if($result->num_rows != 0 ){
+                // echo "ya exsistente";
+                header("HTTP/1.1 406 Not Acceptable");
+            }else{
+                $tipo_user = $datos->tipo_user;
+                $sql = "INSERT INTO `usuario` (`id_u`, `nom_usu`, `pass_usu`, `tipo_user`) VALUES (NULL, '$nomUsu', '$hashPass', '$tipo_user');";
+                $con->query($sql);
+                header("HTTP/1.1 201 Created");
+                echo json_encode($con->insert_id);
+            } 
+        }catch (mysqli_sql_exception $e) {
+            header("HTTP/1.1 404 Not Found");
+        }
+    }else {
+        header("HTTP/1.1 401 Unauthorized");
+        echo "otro usarios $datos->tipo_user";
+    }
+}
+// id_d 	id_u 	nom_d 	apel1_d 	apel2_d 	club 	fecha_eleccion 	
+function modificarDirector($datos){
+    $con = new Conexion();
+    echo "director";
+    if(checkDirector()){
+        try{
+            // Object { tipeRol: "director", nom_d: "", apel1_d: "", apel2_d: "", club: "", fecha_elec: "" }
+            $id_d = $datos -> id_d;
+            $id_u = $datos -> id_u;
+            $nom_d = $datos -> nom_d;
+            $apel1_d = $datos -> apel1_d;
+            $apel2_d = $datos -> apel2_d;
+            $gmail_d = $datos -> gmail_d;
+            $club = $datos -> club;
+            $fecha_elec = $datos -> fecha_elec;
+            $sql = "UPDATE `director`  SET `id_u` = '$id_u', `nom_d` = '$nom_d', `apel1_d` = '$apel1_d', `apel2_d` = '$apel2_d',
+            `gmail_d` = '$gmail_d', `club` = '$club', `fecha_eleccion` = '$fecha_elec' 
+            WHERE `director`.`id_d` =$id_d;";
+            // echo "\n $sql";
+            $con->query($sql);
+            header("HTTP/1.1 201 Created");
+            echo json_encode($con->insert_id);
 
+        }catch (mysqli_sql_exception $e) {
+            header("HTTP/1.1 404 Not Found");
+        }
+    }else {
+        header("HTTP/1.1 401 Unauthorized");
+        echo "otro usarios $datos->tipo_user";
+    }
+}
+function modificarMonitor($datos){
+    $con = new Conexion();
+    if(checkDirector()){
+        try {
+            // Object { id_u: 28, id_d: 1, nom_m: "monitor", apel1_m: "monitor", apel2_m: "monitor", tlf_m: "222333444", curso_m: "4ºepo", carne_conducir: "1", titulo_monitor: "0" }
+            $id_m = $datos->id_m;
+            $id_u = $datos->id_u;
+            $id_d = $datos->id_d;
+            $nom_m = $datos->nom_m;
+            $apel1_m = $datos->apel1_m;
+            $apel2_m = $datos->apel2_m;
+            $tlf_m = $datos->tlf_m;
+            $curso_m = $datos->curso_m;
+            $gmail_m = $datos->gmail_m;
+            $carne_conducir = $datos->carne_conducir;
+            $titulo_monitor = $datos->titulo_monitor;
+    
+            $sql = "UPDATE `monitor` SET
+            `id_u` = '$id_u',
+            `id_d` = '$id_d',
+            `nom_m` = '$nom_m',
+            `apel1_m` = '$apel1_m',
+            `apel2_m` = '$apel2_m',
+            `tlf_m` = '$tlf_m',
+            `curso_m` = '$curso_m',
+            `gmail_m` = '$gmail_m',
+            `carne_conducir` = '$carne_conducir',
+            `titulo_monitor` = '$titulo_monitor'
+            WHERE `monitor`.`id_m` = $id_m;";
+            // echo $sql;
+            $con->query($sql);
+            header("HTTP/1.1 201 Created");
+            echo json_encode($con->insert_id);
+    
+        } catch (mysqli_sql_exception $e) {
+            header("HTTP/1.1 404 Not Found");
+        }
+    
+    }else {
+        header("HTTP/1.1 401 Unauthorized");
+        echo "otro usarios $datos->tipo_user";
+    }
+}
+function modificarSocio($datos){
+    $con = new Conexion();
+    if(checkDirector()){
+        try {
+            // Object { id_u: 30, curso_s: "4ºepo", nom_s: "socio", apel1_s: "socio", apel2_s: "socio", fechNac: "2023-11-21", tlf_s: NULL, colegio: "teresianas", fecha_inscrip: "2023-11-22", observacines: "ninguna" }
+            $id_s = $datos->id_s;
+            $id_u = $datos->id_u;
+            $curso_s = $datos->curso_s;
+            $nom_s = $datos->nom_s;
+            $apel1_s = $datos->apel1_s;
+            $apel2_s = $datos->apel2_s;
+            $fechNac = $datos->fechNac;
+            $tlf_s = $datos->tlf_s;
+            $colegio = $datos->colegio;
+            $fecha_inscrip = $datos->fecha_inscrip;
+            $observacines = $datos->observacines;
+            $sql = "UPDATE `socios` SET
+            `id_u` = '$id_u',
+            `curso_s` = '$curso_s',
+            `nom_s` = '$nom_s',
+            `apel1_s` = '$apel1_s',
+            `apel2_s` = '$apel2_s',
+            `fechNac` = '$fechNac',
+            `tlf_s` = '$tlf_s',
+            `colegio` = '$colegio',
+            `fecha_inscrip` = '$fecha_inscrip',
+            `observacines` = '$observacines'
+            WHERE `socios`.`id_s` = $id_s;";
+
+            $con->query($sql);
+            header("HTTP/1.1 201 Created");
+            echo json_encode($con->insert_id);
+    
+        }catch (mysqli_sql_exception $e) {
+            header("HTTP/1.1 404 Not Found");
+        }
+    }else {
+        header("HTTP/1.1 401 Unauthorized");
+        echo "otro usarios $datos->tipo_user";
+    }
+}
+function modificarFamiliar($datos){
+    $con = new Conexion();
+    if(checkDirector()){
+        try {
+            // Object { id_u: 2, nom_f: "familar", apel1_f: "familiar", apel2_f: "familiar", tlf_f: "444555666", direccion: "republica argentina 2d", localidad: "leon", cp: "24007", parentesco: "familiar", gmail_f: "familiar@gmail.com", id_s: "2" }
+            $id_u = $datos->id_u;
+            $id_f = $datos->id_f;
+            $nom_f = $datos->nom_f;
+            $apel1_f = $datos->apel1_f;
+            $apel2_f = $datos->apel2_f;
+            $tlf_f = $datos->tlf_f;
+            $direccion = $datos->direccion;
+            $localidad = $datos->localidad;
+            $cp = $datos->cp;
+            $parentesco = $datos->parentesco;
+            $gmail_f = $datos->gmail_f;
+            $id_s = $datos->id_s;
+    
+            $sql = "UPDATE `familiar` SET
+            `id_u` = '$id_u',
+            `nom_f` = '$nom_f',
+            `apel1_f` = '$apel1_f',
+            `apel2_f` = '$apel2_f',
+            `tlf_f` = '$tlf_f',
+            `direccion` = '$direccion',
+            `localidad` = '$localidad',
+            `cp` = '$cp',
+            `parentesco` = '$parentesco',
+            `gmail_f` = '$gmail_f',
+            `id_s` = '$id_s'
+            WHERE `familiar`.`id_f` = $id_f;";
+    
+            $con->query($sql);
+            header("HTTP/1.1 201 Created");
+            echo json_encode($con->insert_id);
+            return $con->insert_id;
+    
+        }catch (mysqli_sql_exception $e) {
+            header("HTTP/1.1 404 Not Found");
+        }
+    }else {
+        header("HTTP/1.1 401 Unauthorized");
+        echo "otro usarios $datos->tipo_user";
+    }
+}
 ?>
