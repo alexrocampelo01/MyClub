@@ -5,6 +5,7 @@
   <style>
     table {
       border-collapse: collapse;
+      border: red solid 2px;
     }
 
     td,
@@ -18,21 +19,72 @@
       font-weight: bold;
       background-color: #E6E6E6;
     }
+    span {
+      background-color: aqua;
+    }
   </style>
 </head>
 
 <body>
 
-
+  <div id="infoCalendario">
+    <span id="restarMes"> &lt; </span>
+    <span id="mesCalendario"> </span>
+    <span id="sumarMes"> &gt; </span>
+  </div>
   <div id="calendar"></div>
-
+  <div id="calendario"></div>
+  
   <script>
+
+    //declaramos variables inicializo el dia
+    let hoy = new Date();
+    var dia = hoy.getDate();
+    var mes = hoy.getMonth() + 1; // Nota: ¡Los meses en JavaScript van de 0 a 11!
+    var año = hoy.getFullYear();
+    console.log(`[HOY] ${año}- ${mes} - ${dia}`);
+
+    let textoMesCalendario = document.querySelector('#mesCalendario');
+    
+    createCalendar(calendar, año, mes);
+
+    let sumarMes = document.querySelector('#sumarMes');
+    sumarMes.addEventListener('click', anadirMes);
+    function anadirMes(){
+      console.log("+");
+      mes ++;
+      comprobacionMes(mes);
+      createCalendar(calendar, año, mes);
+    }
+    let restarMes= document.querySelector('#restarMes');
+    restarMes.addEventListener('click', disminuirMes);
+    function disminuirMes(){
+      console.log("-");
+      mes--;
+      comprobacionMes(mes);
+      createCalendar(calendar, año, mes);
+    }
+    function crearClendario2(){
+
+      let divCalendario = document.querySelector('#calendario');
+    let tableConJS = document.createElement('table');
+    tableConJS.innerHTML = "<tr><th>MO</th><th>TU</th><th>WE</th><th>TH</th><th>FR</th><th>SA</th><th>SU</th></tr><tr>"
+      divCalendario.append(tableConJS);
+    }
     function createCalendar(elem, year, month) {
 
+      console.log(`[CREACION CALENDARIO] ${year} - ${month}`);
+
+      let nombresMesesEspañol = ["Enero",  "Febrero",  "Marzo",  "Abril",  "Mayo",  "Junio",  "Julio",  "Agosto",  "Septiembre",  "Octubre",  "Noviembre",  "Diciembre"];
+      let ano = year; 
       let mon = month - 1; // los meses en JS son 0..11, no 1..12
       let d = new Date(year, mon);
 
+
+      textoMesCalendario.textContent = nombresMesesEspañol[d.getMonth()] + ` ${ano}`;
       let table = '<table><tr><th>MO</th><th>TU</th><th>WE</th><th>TH</th><th>FR</th><th>SA</th><th>SU</th></tr><tr>';
+      //comprobacion de cambio de año
+
 
       // espacios en la primera línea
       // desde lunes hasta el primer día del mes
@@ -43,7 +95,7 @@
 
       // <td> con el día  (1 - 31)
       while (d.getMonth() == mon) {
-        table += '<td>' + d.getDate() + '</td>';
+        table += `<td date-fecha='${d}'> ${d.getDate()} </td>`;
 
         if (getDay(d) % 7 == 6) { // domingo, último dia de la semana --> nueva línea
           table += '</tr><tr>';
@@ -62,18 +114,55 @@
 
       // cerrar la tabla
       table += '</tr></table>';
+      elem.addEventListener('click', selcionarDia);
 
       elem.innerHTML = table;
     }
-
     function getDay(date) { // obtiene el número de día desde 0 (lunes) a 6 (domingo)
       let day = date.getDay();
       if (day == 0) day = 7; // hacer domingo (0) el último día
       return day - 1;
     }
+    function comprobacionMes(mes){
+      console.log(`[MES] comprobae`, mes );
+      if(mes <= 0){
+        this.mes = 12;
+        this.año = this.año - 1;
+      }else if(mes > 11){
+        this.mes = 1;
+        this.año = this.año +1;
+      }
+    }
+    function getActividades(month){
 
-    createCalendar(calendar, 2012, 9);
-  </script>
+    }
+    function selcionarDia(e){
+      console.log(`clicado el dia`);
+      console.log('elemeto', e.target);
+      console.log('atrivuto', e.target.getAttribute("date-fecha"));
+      let fecha = convertirDateATextoSQL(e.target.getAttribute("date-fecha"));
+      console.log("fecha", fecha);
+
+
+    }
+    function convertirDateATextoSQL(fecha) {
+      let date = new Date(fecha);
+      console.log(date);
+      let year = date.getFullYear();
+      let month = (date.getMonth() + 1).toString().padStart(2, '0');
+      let day = date.getDate().toString().padStart(2, '0');
+      let hours = date.getHours().toString().padStart(2, '0');
+      let minutes = date.getMinutes().toString().padStart(2, '0');
+      let seconds = date.getSeconds().toString().padStart(2, '0');
+
+      let formatoSQL = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+      return formatoSQL;
+    }
+
+    
+ </script>
+
 
 </body>
 </html>
