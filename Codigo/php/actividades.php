@@ -12,6 +12,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
             $lista = $_GET['lista'];
             if($lista == "fecha"){
                 $sql = "SELECT * FROM `actividades` WHERE 1 and fechaHora = '$filtro' ";
+            }else if($lista == "rangoFechas"){
+                $rangoFechas = explode(",", $filtro);
+                // print_r($rangoFechas);
+                $sql = "SELECT * FROM `actividades` WHERE 1 and fechaHora >= '$rangoFechas[0]' AND fechaHora <= '$rangoFechas[1]'";
             }else if($lista == "curso"){
                 $sql = "SELECT * FROM `actividades` WHERE 1 and curso_ac like '$filtro' ";
             }else if($lista == "id"){
@@ -27,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
                 $sql = "SELECT * FROM `actividades` WHERE 1 ";
             }
             try{
+                // echo $sql;
                 $result = $con->query($sql);
                 // print_r($result);
                 $actividades = $result->fetch_all(MYSQLI_ASSOC);
