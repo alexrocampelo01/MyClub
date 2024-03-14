@@ -39,6 +39,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
                 // echo "lista de responsable";
                 responsableMonitor();
                 break;
+            case 'clubNombres':
+                // echo "lista de responsable";
+                listaclubUnicos();
+                break;
         }
     }
     // try {
@@ -354,6 +358,7 @@ function crearFamiliar($datos){
 }
 
 // consultas para consultar y sacar listas de los usarios
+
 function listaUsuarios($id_u = 0){
     $con = new Conexion();
     if(checkDirector()){
@@ -361,9 +366,13 @@ function listaUsuarios($id_u = 0){
             $id_u = -1;
             if(isset($_GET['id_usuario'])){
                 $id_u = $_GET['id_usuario'];
+            }else{
+
             }
             if($id_u > 0){
                 $sql = "SELECT * FROM `usuario` WHERE 1 AND id_u = $id_u";
+            }else if(isset($club)){
+                $sql = "SELECT * FROM `usuario` WHERE 1";
             }else{
                 $sql = "SELECT * FROM `usuario` WHERE 1";
             }
@@ -381,13 +390,38 @@ function listaUsuarios($id_u = 0){
 }
 function listaDirectores($id_d = 0){
     $con = new Conexion();
+    if(isset($_GET['club'])){
+        $club = $_GET['club'];
+    }
+    if(isset($_GET['id_d'])){
+        $id_d = $_GET['id_d'];
+    }
     if(checkDirector()){
         try{
             if($id_d > 0){
                 $sql = "SELECT * FROM `director` WHERE 1 AND id_d = $id_d";
+            }else if($club){
+                $sql = "SELECT * FROM director WHERE club LIKE '%$club%'; ";
             }else{
                 $sql = "SELECT * FROM `director` WHERE 1";
             }
+            // echo $sql;
+            $result = $con->query($sql);
+            $director = $result->fetch_all(MYSQLI_ASSOC);
+            echo json_encode($director);
+        }catch (mysqli_sql_exception $e) {
+            header("HTTP/1.1 404 Not Found");
+        }
+    }else {
+        header("HTTP/1.1 401 Unauthorized");
+        echo "otro usarios $datos->tipo_user";
+    }
+}
+function listaclubUnicos(){
+    $con = new Conexion();
+    if(checkDirector()){
+        try{
+            $sql = "SELECT DISTINCT club FROM `director`"; 
             // echo $sql;
             $result = $con->query($sql);
             $socios = $result->fetch_all(MYSQLI_ASSOC);
