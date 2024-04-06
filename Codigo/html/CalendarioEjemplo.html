@@ -138,7 +138,7 @@
 
       // <td> con el día  (1 - 31)
       while (d.getMonth() == mon) {
-        table += `<td dayWhitActivity date-fecha='${convertirDateATextoSQL(d)}'> ${d.getDate()}`;
+        table += `<td class="dayWhitActivity" date-fecha='${convertirDateATextoSQL(d)}'> ${d.getDate()}`;
         let actividadesHoy = await obtenerActividadesPorFecha(listaActividades, d);
         if(actividadesHoy.length > 0){
           console.log(`[activiadesHOY]`, actividadesHoy);

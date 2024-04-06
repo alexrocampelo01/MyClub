@@ -1,13 +1,37 @@
-<form id="formulario">
-    <label for="nomUsu_p">Nombre de Usuario</label>
-    <input type="text" name="nomUsu_p" id="nomUsu_p">
-    <label for="passUsu_p">Contraseña de usuario</label>
-    <input type="text" name="passUsu_p" id="passUsu_p">
+<form id="formulario" name="usuario">
+    <label for="nom_usu">Nombre de Usuario</label>
+    <input type="text" name="nom_usu" id="nom_usu">
+
+    <label for="pass">Contraseña de usuario</label>
+    <input type="text" name="pass" id="pass">
+
+    <label for="nom">Nombre</label>
+    <input type="text" name="nom" id="nom">
+
+    <label for="apel1">Primer apellido</label>
+    <input type="text" name="apel1" id="apel1">
+
+    <label for="apel2">Primer apellido</label>
+    <input type="text" name="apel2" id="apel2">
+
+    <label for="correo">Correo electronico</label>
+    <input type="text" name="correo" id="correo">
+
+    <label for="tlf">Telefono</label>
+    <input type="number" name="tlf" id="tlf" max="9">
+    <label for="tipo_user">Tipo de usario</label>
     <select name="tipo_user" id="tipo_user">
         <option value="director">Director</option>
         <option value="monitor">Monitor</option>
-        <option value="socios">Socio</option>
-        <option value="padres">Padre</option>
+        <option value="socio">Socio</option>
+        <option value="familiar">Familiar</option>
     </select>
-    <span id="butUser">Crear Usuario</span>
+    <div id="formTipo">
+        
+    </div>
+    <!-- <span>
+        <input type="checkbox" name="leyDatos" id="leyDatos"><label> Autoriza ha el uso de estos datos</label>
+        <h2>aviso legar de lay de proteccion de datos</h2>
+    </span> -->
+    <!-- <span id="butUser">Crear Usuario</span> -->
 </form>

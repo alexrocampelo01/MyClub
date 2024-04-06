@@ -1,5 +1,5 @@
 <?php
-//aparatdop de decraraciones he inportaciones
+//aparatdo de decraraciones he inportaciones
 require_once('../php/permisos.php');
 
 
@@ -58,10 +58,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     //         echo json_encode($usuario);
     //     }
     //     catch (mysqli_sql_exception $e) {
-    //         header("HTTP/1.1 404 Not Found");
+    //          // echo $e;
+            header("HTTP/1.1 500 Internal Server Error");
     //     }
     // exit;
 }
+//Recojemos todas la peticiones POST
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $json = file_get_contents('php://input');
     $datos = json_decode($json);
@@ -71,11 +73,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }else{
         // print_r($datos);
         if(isset($datos->tipeRol)){
-            if($datos->tipeRol == "usuarios"){
-                //echo "\n crear usuario";
+            if($datos->tipeRol == "usuario"){
                 crearUsuario($datos);
-
-            }else if($datos->tipeRol == "socios"){
+            }else if($datos->tipeRol == "socio"){
                 crearSocio($datos);
                 // echo" \n crear socio";
             }else if ($datos->tipeRol == "monitor"){
@@ -188,66 +188,76 @@ function login($datos){
         } 
     }catch (mysqli_sql_exception $e) {
         echo $e;
-        header("HTTP/1.1 404 Not Found");
+        header("HTTP/1.1 500 Internal Server Error");
     }
 }
 //creamos un usario 
 function crearUsuario($datos){
     $con = new Conexion();
-    //echo "$permisos";
-    if(checkDirector()){
+    // print_r($datos);
+    if(checkDirector()){ // verificamos persos de director
         try {
+            //comprobamos que no exixten usarios con mismo nombre
             $nomUsu = $datos->nom_usu;
             $passUsu = $datos->pass_usu;
             $hashPass = hash('sha512', $passUsu);
-            $sql = "SELECT * FROM `usuario` WHERE 1 AND nom_usu LIKE '$nomUsu';";
+            $sql = "SELECT * FROM `usuarios` WHERE 1 AND nom_usu LIKE '$nomUsu';";
             $result = $con->query($sql);
-            // comprovamos que alla resultado
+            // lazamos un error
             if($result->num_rows != 0 ){
-                // echo "ya exsistente";
                 header("HTTP/1.1 406 Not Acceptable");
-            }else{
+            }else{ // creamos el usario
+                $nom = $datos->nom;
+                $apel1 = $datos->apel1;
+                $apel2 = $datos->apel2;
+                $correo = $datos->correo;
+                $tlf = $datos->tlf;
                 $tipo_user = $datos->tipo_user;
-                $sql = "INSERT INTO `usuario` (`id_u`, `nom_usu`, `pass_usu`, `tipo_user`) VALUES (NULL, '$nomUsu', '$hashPass', '$tipo_user');";
+                $sql = "INSERT INTO `usuarios` (`id`, `nom_usu`, `pass`, `nom`, `apel1`, `apel2`, `correo`, `tlf`, `tipo_user`) VALUES
+                (NULL, '$nomUsu', '$hashPass', '$nom', '$apel1', '$apel2', '$correo', '$tlf', '$tipo_user')";
+                // echo $sql;
                 $con->query($sql);
                 header("HTTP/1.1 201 Created");
                 echo json_encode($con->insert_id);
             } 
         }catch (mysqli_sql_exception $e) {
-            header("HTTP/1.1 404 Not Found");
+            // echo $e;
+            header("HTTP/1.1 500 Internal Server Error");
         }
     }else {
+        echo "No autorizado";
         header("HTTP/1.1 401 Unauthorized");
-        echo "otro usarios $datos->tipo_user";
     }
 }
-// id_d 	id_u 	nom_d 	apel1_d 	apel2_d 	club 	fecha_eleccion 	
+//creamos al director
 function crearDirector($datos){
     $con = new Conexion();
     if(checkDirector()){
         try{
-            // Object { tipeRol: "director", nom_d: "", apel1_d: "", apel2_d: "", club: "", fecha_elec: "" }
             $id_u = $datos -> id_u;
-            $nom_d = $datos -> nom_d;
-            $apel1_d = $datos -> apel1_d;
-            $apel2_d = $datos -> apel2_d;
-            $gmail_d = $datos -> gmail_d;
-            $club = $datos -> club;
-            $fecha_elec = $datos -> fecha_elec;
-            $sql = "INSERT INTO `director` (`id_d`, `id_u`, `nom_d`, `apel1_d`, `apel2_d`, `gmail_d`, `club`, `fecha_eleccion`)
-                    VALUES (NULL, '$id_u', '$nom_d', '$apel1_d', '$apel2_d', '$gmail_d', '$club', '$fecha_elec');";
-            $con->query($sql);
-            header("HTTP/1.1 201 Created");
-            echo json_encode($con->insert_id);
-
+            // lazamos un error
+            if(checkIdUserExsits($id)){ 
+                $club = $datos -> club;
+                $fecha_elec = $datos -> fecha_elec;
+                $sql = "INSERT INTO `director` (`id`, `id_u`, `club`, `fechaEleccion`) VALUES
+                        (NULL, '$id_u', '$club', '$fecha_elec');";
+                $con->query($sql);
+                header("HTTP/1.1 201 Created");
+                echo json_encode($con->insert_id);
+            }else{
+                echo "id no exixte";
+                header("HTTP/1.1 406 Not Acceptable");
+            }
         }catch (mysqli_sql_exception $e) {
-            header("HTTP/1.1 404 Not Found");
+            // echo $e;
+            header("HTTP/1.1 500 Internal Server Error");
         }
     }else {
+        echo "No autorizado";
         header("HTTP/1.1 401 Unauthorized");
-        echo "otro usarios $datos->tipo_user";
     }
 }
+//crear al monitor
 function crearMonitor($datos){
     $con = new Conexion();
     if(checkDirector()){
@@ -255,24 +265,24 @@ function crearMonitor($datos){
             // Object { id_u: 28, id_d: 1, nom_m: "monitor", apel1_m: "monitor", apel2_m: "monitor", tlf_m: "222333444", curso_m: "4ºepo", carne_conducir: "1", titulo_monitor: "0" }
             $id_u = $datos->id_u;
             $id_d = $datos->id_d;
-            $nom_m = $datos->nom_m;
-            $apel1_m = $datos->apel1_m;
-            $apel2_m = $datos->apel2_m;
-            $tlf_m = $datos->tlf_m;
+           if(checkIdUserExsits($id_u) && checkIdDirectorExsits($id_d)){
             $curso_m = $datos->curso_m;
-            $gmail_m = $datos->gmail_m;
             $carne_conducir = $datos->carne_conducir;
             $titulo_monitor = $datos->titulo_monitor;
     
-            $sql = "INSERT INTO `monitor` (`id_m`, `id_u`, `id_d`, `nom_m`, `apel1_m`, `apel2_m`, `tlf_m`, `curso_m`, `gmail_m`, `carne_conducir`, `titulo_monitor`) 
-                    VALUES (NULL, '$id_u', '$id_d', '$nom_m', '$apel1_m', '$apel2_m', '$tlf_m', '$curso_m', '$gmail_m', '$carne_conducir', '$titulo_monitor');";
+            $sql = "INSERT INTO `monitores` (`id`, `id_u`, `id_d`, `curso`, `carne_c`, `titulo_m`) VALUES
+             (NULL, '$id_u', '$id_d', '$curso_m', '$carne_conducir', '$titulo_monitor');";
             // echo $sql;
             $con->query($sql);
             header("HTTP/1.1 201 Created");
             echo json_encode($con->insert_id);
-    
+           }else{
+            // echo "id no exixte";
+            header("HTTP/1.1 406 Not Acceptable");
+           }    
         } catch (mysqli_sql_exception $e) {
-            header("HTTP/1.1 404 Not Found");
+             // echo $e;
+             header("HTTP/1.1 500 Internal Server Error");
         }
     
     }else {
@@ -286,37 +296,39 @@ function crearSocio($datos){
         try {
             // Object { id_u: 30, curso_s: "4ºepo", nom_s: "socio", apel1_s: "socio", apel2_s: "socio", fechNac: "2023-11-21", tlf_s: NULL, colegio: "teresianas", fecha_inscrip: "2023-11-22", observacines: "ninguna" }
             $id_u = $datos->id_u;
-            $curso_s = $datos->curso_s;
-            $nom_s = $datos->nom_s;
-            $apel1_s = $datos->apel1_s;
-            $apel2_s = $datos->apel2_s;
-            $fechNac = $datos->fechNac;
-            $tlf_s = $datos->tlf_s;
-            $colegio = $datos->colegio;
-            $fecha_inscrip = $datos->fecha_inscrip;
-            $observacines = $datos->observacines;
-            $familiares = $datos->familiares;
-            if(isset($familiares)){
-                // print_r($familiares);
-                if(count($familiares) == 0){
-                    header("HTTP/1.1 500 Internal Server Error");
-                    echo "no hay familiares";
-                    exit;
-                }else{
-                    foreach($familiares as $familiar){
-                        crearFamiliar($familiar);
+            if(checkIdUserExsits($id_u)){
+                $curso_s = $datos->curso_s;
+                $colegio = $datos->colegio;
+                $observacines = $datos->observacines;
+                $fechNac = $datos->fechNac;
+                $fecha_inscrip = $datos->fecha_inscrip;
+                $familiares = $datos->familiares;
+                if(isset($familiares)){
+                    // print_r($familiares);
+                    if(count($familiares) == 0){
+                        header("HTTP/1.1 500 Internal Server Error");
+                        echo "no hay familiares";
+                        exit;
+                    }else{
+                        foreach($familiares as $familiar){
+                            crearFamiliar($familiar);
+                        }
                     }
                 }
-            }
-            $sql = "INSERT INTO `socios` (`id_s`, `id_u`, `curso_s`, `nom_s`, `apel1_s`, `apel2_s`, `fechNac`, `tlf_s`, `colegio`, `fecha_inscrip`, `observacines`)
-                    VALUES (NULL, '$id_u', '$curso_s', '$nom_s', '$apel1_s', '$apel2_s', '$fechNac', $tlf_s, '$colegio', '$fecha_inscrip', '$observacines');";
+                $sql = "INSERT INTO `socios` (`id`, `id_u`, `curso`, `colegio`, `observaciones`, `fechaNacimiento`, `fechaInscrip`) VALUES
+                (NULL, '$id_u', '$curso_s', '$colegio', '$observacines', '$fechNac', '$fecha_inscrip');";
 
-            $con->query($sql);
-            header("HTTP/1.1 201 Created");
-            echo json_encode($con->insert_id);
+                $con->query($sql);
+                header("HTTP/1.1 201 Created");
+                echo json_encode($con->insert_id);
+            }else{
+            // echo "id no exixte";
+            header("HTTP/1.1 406 Not Acceptable");
+            }
     
         }catch (mysqli_sql_exception $e) {
-            header("HTTP/1.1 404 Not Found");
+             // echo $e;
+             header("HTTP/1.1 500 Internal Server Error");
         }
     }else {
         header("HTTP/1.1 401 Unauthorized");
@@ -327,29 +339,29 @@ function crearFamiliar($datos){
     $con = new Conexion();
     if(checkDirector()){
         try {
-            // Object { id_u: 2, nom_f: "familar", apel1_f: "familiar", apel2_f: "familiar", tlf_f: "444555666", direccion: "republica argentina 2d", localidad: "leon", cp: "24007", parentesco: "familiar", gmail_f: "familiar@gmail.com", id_s: "2" }
             $id_u = $datos->id_u;
-            $nom_f = $datos->nom_f;
-            $apel1_f = $datos->apel1_f;
-            $apel2_f = $datos->apel2_f;
-            $tlf_f = $datos->tlf_f;
-            $direccion = $datos->direccion;
-            $localidad = $datos->localidad;
-            $cp = $datos->cp;
-            $parentesco = $datos->parentesco;
-            $gmail_f = $datos->gmail_f;
             $id_s = $datos->id_s;
-    
-            $sql = "INSERT INTO `familiar` (`id_u`, `nom_f`, `apel1_f`, `apel2_f`, `tlf_f`, `direccion`, `localidad`, `cp`, `parentesco`, `gmail_f`, `id_s`)
-                    VALUES ('$id_u', '$nom_f', '$apel1_f', '$apel2_f', '$tlf_f', '$direccion', '$localidad', '$cp', '$parentesco', '$gmail_f', '$id_s');";
-            // echo $sql;
-            $con->query($sql);
-            header("HTTP/1.1 201 Created");
-            echo json_encode($con->insert_id);
-            return $con->insert_id;
+            if(checkIdUserExsits($id_u) && checkIdSocioExsits($id_u)){
+                echo "creo familiar";
+                $direccion = $datos->direccion;
+                $localidad = $datos->localidad;
+                $cp = $datos->cp;
+                $parentesco = $datos->parentesco;    
+                $sql = "INSERT INTO `familiares` (`id`, `id_u`, `id_s`, `direccion`, `localidad`, `cp`, `parentesco`)
+                        VALUES (NULL, '$id_u', '$id_s', '$direccion', '$localidad', '$cp', '$parentesco');";
+                // echo $sql;
+                $con->query($sql);
+                header("HTTP/1.1 201 Created");
+                echo json_encode($con->insert_id);
+                return $con->insert_id;
+            }else{
+            // echo "id no exixte";
+            header("HTTP/1.1 406 Not Acceptable");
+            }
     
         }catch (mysqli_sql_exception $e) {
-            header("HTTP/1.1 404 Not Found");
+             // echo $e;
+             header("HTTP/1.1 500 Internal Server Error");
         }
     }else {
         header("HTTP/1.1 401 Unauthorized");
@@ -381,7 +393,8 @@ function listaUsuarios($id_u = 0){
             $socios = $result->fetch_all(MYSQLI_ASSOC);
             echo json_encode($socios);
         }catch (mysqli_sql_exception $e) {
-            header("HTTP/1.1 404 Not Found");
+             // echo $e;
+            header("HTTP/1.1 500 Internal Server Error");
         }
     }else {
         header("HTTP/1.1 401 Unauthorized");
@@ -410,7 +423,8 @@ function listaDirectores($id_d = 0){
             $director = $result->fetch_all(MYSQLI_ASSOC);
             echo json_encode($director);
         }catch (mysqli_sql_exception $e) {
-            header("HTTP/1.1 404 Not Found");
+             // echo $e;
+            header("HTTP/1.1 500 Internal Server Error");
         }
     }else {
         header("HTTP/1.1 401 Unauthorized");
@@ -427,7 +441,8 @@ function listaclubUnicos(){
             $socios = $result->fetch_all(MYSQLI_ASSOC);
             echo json_encode($socios);
         }catch (mysqli_sql_exception $e) {
-            header("HTTP/1.1 404 Not Found");
+             // echo $e;
+            header("HTTP/1.1 500 Internal Server Error");
         }
     }else {
         header("HTTP/1.1 401 Unauthorized");
@@ -462,7 +477,8 @@ function listaSocios($id_s = 0){
             $socios = $result->fetch_all(MYSQLI_ASSOC);
             echo json_encode($socios);
         }catch (mysqli_sql_exception $e) {
-            header("HTTP/1.1 404 Not Found");
+             // echo $e;
+            header("HTTP/1.1 500 Internal Server Error");
         }
     }
 }
@@ -531,7 +547,8 @@ function familiaresDelSocio($id_s = 0){
             }
         }catch (mysqli_sql_exception $e) {
             header("HTTP/1.1 406 Not Acceptable");
-            // header("HTTP/1.1 404 Not Found");
+            //  // echo $e;
+            header("HTTP/1.1 500 Internal Server Error");
         }
     }
 }
@@ -558,7 +575,8 @@ function modificarUsuario($datos){
                 echo json_encode($con->insert_id);
             } 
         }catch (mysqli_sql_exception $e) {
-            header("HTTP/1.1 404 Not Found");
+             // echo $e;
+            header("HTTP/1.1 500 Internal Server Error");
         }
     }else {
         header("HTTP/1.1 401 Unauthorized");
@@ -589,7 +607,8 @@ function modificarDirector($datos){
             echo json_encode($con->insert_id);
 
         }catch (mysqli_sql_exception $e) {
-            header("HTTP/1.1 404 Not Found");
+             // echo $e;
+            header("HTTP/1.1 500 Internal Server Error");
         }
     }else {
         header("HTTP/1.1 401 Unauthorized");
@@ -631,7 +650,8 @@ function modificarMonitor($datos){
             echo json_encode($con->insert_id);
     
         } catch (mysqli_sql_exception $e) {
-            header("HTTP/1.1 404 Not Found");
+             // echo $e;
+            header("HTTP/1.1 500 Internal Server Error");
         }
     
     }else {
@@ -673,7 +693,8 @@ function modificarSocio($datos){
             echo json_encode($con->insert_id);
     
         }catch (mysqli_sql_exception $e) {
-            header("HTTP/1.1 404 Not Found");
+             // echo $e;
+            header("HTTP/1.1 500 Internal Server Error");
         }
     }else {
         header("HTTP/1.1 401 Unauthorized");
@@ -718,11 +739,57 @@ function modificarFamiliar($datos){
             return $con->insert_id;
     
         }catch (mysqli_sql_exception $e) {
-            header("HTTP/1.1 404 Not Found");
+             // echo $e;
+            header("HTTP/1.1 500 Internal Server Error");
         }
     }else {
         header("HTTP/1.1 401 Unauthorized");
         echo "otro usarios $datos->tipo_user";
+    }
+}
+function checkIdUserExsits($id){ 
+    $con = new Conexion();
+    try{
+        $sql = "SELECT * FROM `usuarios` WHERE 1 AND id = $id;";
+        $result = $con->query($sql);
+        // lazamos un error
+        if($result->num_rows != 0 ){
+            return true;
+        }else{
+            return false;
+        }
+    }catch (mysqli_sql_exception $e) {
+        header("HTTP/1.1 500 Internal Server Error");
+    }
+}
+function checkIdDirectorExsits($id){
+    $con = new Conexion();
+    try{
+        $sql = "SELECT * FROM `director` WHERE 1 AND id = $id;";
+        $result = $con->query($sql);
+        // lazamos un error
+        if($result->num_rows != 0 ){
+            return true;
+        }else{
+            return false;
+        }
+    }catch (mysqli_sql_exception $e) {
+        header("HTTP/1.1 500 Internal Server Error");
+    }
+}
+function checkIdSocioExsits($id){
+    $con = new Conexion();
+    try{
+        $sql = "SELECT * FROM `socios` WHERE 1 AND id = $id;";
+        $result = $con->query($sql);
+        // lazamos un error
+        if($result->num_rows != 0 ){
+            return true;
+        }else{
+            return false;
+        }
+    }catch (mysqli_sql_exception $e) {
+        header("HTTP/1.1 500 Internal Server Error");
     }
 }
 ?>

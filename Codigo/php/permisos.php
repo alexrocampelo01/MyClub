@@ -31,8 +31,8 @@ function comprobarPermisos(){
         //print_r($usarios);
         return $usarios->userRol;
     }catch (Exception $e){
-        echo"error de cofificar jwt ($e)";
-
+        header("HTTP/1.1 401 Unauthorized");
+        echo "Usuario no autorizado";
     }
 }
 //tipo de usarios para permisos

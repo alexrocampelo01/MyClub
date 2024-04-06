@@ -1,11 +1,56 @@
 let urlLocal = 'http://localhost/Myclub/Codigo/php/'
 let webToken = "";
-cargaDinamicaForms();
+// cargaDinamicaForms();
 
+let butUser = document.querySelector('#butUser');
+butUser.addEventListener('click', crearUsuario); 
+console.log("hola");
+document.addEventListener('DOMContentLoaded', function() {
+    var tipoUser = document.getElementById('tipo_user');
 
+    tipoUser.addEventListener('change', function() {
+        // Aquí va el código que se ejecutará cuando cambie el valor del selector
+        console.log('El valor del selector ha cambiado a: ' + this.value);
+        loadForm(this.value)
+    });
 
-let textoDebug = document.querySelector('#debugTitulo');
+    // Aquí va el código que se ejecutará cuando se cargue la página
+    console.log('La página ha cargado y el valor inicial del selector es: ' + tipoUser.value);
+    loadForm(tipoUser.value);
+});
+function loadForm(tipoUser = ''){
+    let rutaFomr = "";
+    switch(tipoUser){
+        case 'director':
+            rutaFomr = "../html/Componentes/Formularios/formulariosDirector.html";
+            break;  
+        case 'monitor':
+            console.log("monitor");
+            rutaFomr = "../html/Componentes/Formularios/formulariosMonitor.html";
+            break;
+        case 'socio':
+            rutaFomr = "../html/Componentes/Formularios/formulariosSocios.html";
+            break;
+        case 'familiar':
+            rutaFomr = "../html/Componentes/Formularios/formulariosFamiliar.html";
+            break;
+        default:    
+            // rutaFomr = "../html/Componentes/Formularios/formularioUsuarios.html";
+            console.log("no hay formulario");
+            break;
+    }
+    console.log("sacando form correcto"  +  rutaFomr);
+    let divForm = document.querySelector('#formTipo');
+    fetch(rutaFomr)
+    .then(response => response.text())
+    .then((html) => {
+        divForm.innerHTML= html; 
+    });
+}
+
+let textoDebug = document.querySelector('#errores');
 textoDebug.textContent= "hola angel";
+
 
 console.log("hola funciono");
 function crearUsuario(){
@@ -14,7 +59,7 @@ function crearUsuario(){
     let datosUsuario;
     datosUsuario = recojerFormularioUsuario();
     //console.log(datosUsuario);
-   lanzarForm(datosUsuario);
+//    lanzarForm(datosUsuario);
 }
 function login(){
     localStorage.setItem('tipoUser',tipo_user.value);
@@ -23,18 +68,54 @@ function login(){
 }
 
 function recojerFormularioUsuario(){
-    if(validarForm()){
+    // if(validarForm()){
         let datosU = {}
         datosU.tipeRol = "usuarios";
         datosU.tipo_user = document.querySelector('#tipo_user').value;
-        datosU.nom_usu = document.querySelector('#nomUsu_p').value;
-        datosU.pass_usu = document.querySelector('#passUsu_p').value;
+        datosU.nom_usu = document.querySelector('#nom_usu').value;
+        datosU.pass = document.querySelector('#pass').value;
+        datosU.nom = document.querySelector('#nom').value;
+        datosU.apel1 = document.querySelector('#apel1').value;
+        datosU.apel2 = document.querySelector('#apel2').value;
+        datosU.tlf = document.querySelector('#tlf').value;
+        datosU.email = document.querySelector('#correo').value;
+        let datosAdicionales = {};
+        switch(datosU.tipo_user){
+            case 'director':
+                datosAdicionales.club = document.querySelector('#club').value;
+                datosAdicionales.fecha_elec = document.querySelector('#fecha_elec').value;
+                break;
+            case 'monitor':
+                datosAdicionales.curso_m = document.querySelector('#curso_m').value;
+                datosAdicionales.carne_conducir = document.querySelector('#carne_conducir').value;
+                datosAdicionales.titulo_monitor = document.querySelector('#titulo_monitor').value;
+                break;
+            case 'socios':
+                datosAdicionales.curso = document.querySelector('#curso').value;
+                datosAdicionales.colegio = document.querySelector('#colegio').value;
+                datosAdicionales.fechNac = document.querySelector('#fechNac').value;
+                datosAdicionales.fecha_inscrip = document.querySelector('#fecha_inscrip').value;
+                datosAdicionales.observaciones = document.querySelector('#observaciones').value;
+                break;
+            case 'familiar':
+                datosAdicionales.dir = document.querySelector('#dir').value;
+                datosAdicionales.loc = document.querySelector('#loc').value;
+                datosAdicionales.cp = document.querySelector('#cp').value;
+                datosAdicionales.parentesco = document.querySelector('#parentesco').value;
+                break;
+            default:
+                console.log("no hay datos adicionales");
+                break;
+        }
         console.log(datosU);
-        return datosU;
-    }else {
-        console.log("datos incorrectos");
-        return false;
-    }
+        console.log(datosAdicionales);
+        //lanzarForm(datosU);
+
+        // return datosU;
+    // }else {
+    //     console.log("datos incorrectos");
+    //     return false;
+    // }
 }
 function recojerFormularioLog(){
     let datosU = {};
@@ -51,10 +132,7 @@ function recogerFormDirector(){
     
     let datosDir = {};
     datosDir.tipeRol = "director"
-    datosDir.id_u = localStorage.getItem('id_u')
-    datosDir.nom_d = document.querySelector('#nom_d').value;
-    datosDir.apel1_d = document.querySelector('#apel1_d').value;
-    datosDir.apel2_d = document.querySelector('#apel2_d').value;
+
     datosDir.club = document.querySelector('#club').value;
     datosDir.fecha_elec = document.querySelector('#fecha_elec').value;
     console.log(datosDir);
@@ -211,73 +289,72 @@ async function lanzarForm(dataForm){ // arreglar
         cargaDinamicaForms(dataForm.tipo_user);
     })
 }
-function cargaDinamicaForms(tipo_user = ''){
-    console.log("sacando form correcto"  +  tipo_user);
-    switch(tipo_user){
-        case 'director':
-            rutaFomr = "../html/Componentes/Formularios/formulariosDirector.html";
-            break;
-        case 'monitor':
-            rutaFomr = "../html/Componentes/Formularios/formulariosMonitor.html";
-            break;
-        case 'socios':
-            rutaFomr = "../html/Componentes/Formularios/formulariosSocios.html";
-            break;
-        default:
-            rutaFomr = "../html/Componentes/Formularios/formularioUsuarios.html";
-            break;
+// function cargaDinamicaForms(tipo_user = ''){
+//     console.log("sacando form correcto"  +  tipo_user);
+//     switch(tipo_user){
+//         case 'director':
+//             rutaFomr = "../html/Componentes/Formularios/formulariosDirector.html";
+//             break;
+//         case 'monitor':
+//             rutaFomr = "../html/Componentes/Formularios/formulariosMonitor.html";
+//             break;
+//         case 'socios':
+//             rutaFomr = "../html/Componentes/Formularios/formulariosSocios.html";
+//             break;
+//         default:
+//             rutaFomr = "../html/Componentes/Formularios/formularioUsuarios.html";
+//             break;
 
-    }
-    let divForm = document.querySelector('#zonaForm');
-    fetch(rutaFomr)
-    .then(response => response.text())
-    .then((html) => {
-        //console.log("contenido form ="+ document.querySelector('#zonaForm').innerHTML);
-        divForm.innerHTML= html; 
-        switch(tipo_user){
-            case 'director':
-                let butDir = document.querySelector('#butDir');
-                butDir.addEventListener('click', recogerFormDirector);
-                break;
-            case 'monitor':
-                let butMonitor = document.querySelector('#butMonitor');
-                butMonitor.addEventListener('click', recogerFormMonitor);
-                break;
-            case 'socios':
-                let butSocio = document.querySelector('#butSocio');
-                butSocio.addEventListener('click', recogerFormSocio);
-                break;
-            default:
-                let butUser = document.querySelector('#butUser');
-                butUser.addEventListener('click', crearUsuario);
-                break;
+//     }
+//     let divForm = document.querySelector('#zonaForm');
+//     fetch(rutaFomr)
+//     .then(response => response.text())
+//     .then((html) => {
+//         //console.log("contenido form ="+ document.querySelector('#zonaForm').innerHTML);
+//         divForm.innerHTML= html; 
+//         switch(tipo_user){
+//             case 'director':
+//                 let butDir = document.querySelector('#butDir');
+//                 butDir.addEventListener('click', recogerFormDirector);
+//                 break;
+//             case 'monitor':
+//                 let butMonitor = document.querySelector('#butMonitor');
+//                 butMonitor.addEventListener('click', recogerFormMonitor);
+//                 break;
+//             case 'socios':
+//                 let butSocio = document.querySelector('#butSocio');
+//                 butSocio.addEventListener('click', recogerFormSocio);
+//                 break;
+//             default:
+//                 let butUser = document.querySelector('#butUser');
+//                 butUser.addEventListener('click', crearUsuario);
+//                 break;
     
-        }
-    })
-}
+//         }
+//     })
+// }
 
-let butLog = document.querySelector('#butLog');
-butLog.addEventListener('click', login);
 
-function validarFormUsurio(){
-    //creamos el validador de que el contenido es una cadena 
-    let condicionNom = /^[A-Za-z]+$^/;
-    let condicionPass = /^[A-Za-z]+$^/;
-    if(document.querySelector('#nomUsu_p').value.trim() === ''){
-        textoDebug.textContent = "nombre no puede estar vacio";
-        return false;
-    }
-    if(!document.querySelector('#nomUsu_p').value.test(condicionSoloTexto)){
-        textoDebug.textContent = "Nombre no cumple las condiciones";
-        return false;
-    }
-    if(document.querySelector('#passUsu_p').value.trim() === ''){
-        textoDebug.textContent = "Contraseña vacia";
-        return false;
-    }
-    if(!document.querySelector('#passUsu_p').value.test(condicionSoloTexto)){
-        textoDebug.textContent = "Contraseña no cumple las condiciones";
-        return false;
-    }
-    return true;
-}
+
+// function validarFormUsurio(){
+//     //creamos el validador de que el contenido es una cadena 
+//     let condicionNom = /^[A-Za-z]+$^/;
+//     let condicionPass = /^[A-Za-z]+$^/;
+//     if(document.querySelector('#nomUsu_p').value.trim() === ''){
+//         textoDebug.textContent = "nombre no puede estar vacio";
+//         return false;
+//     }
+//     if(!document.querySelector('#nomUsu_p').value.test(condicionSoloTexto)){
+//         textoDebug.textContent = "Nombre no cumple las condiciones";
+//         return false;
+//     }
+//     if(document.querySelector('#passUsu_p').value.trim() === ''){
+//         textoDebug.textContent = "Contraseña vacia";
+//         return false;
+//     }
+//     if(!document.querySelector('#passUsu_p').value.test(condicionSoloTexto)){
+//         textoDebug.textContent = "Contraseña no cumple las condiciones";
+//         return false;
+//     }
+//     return true;
+// }
