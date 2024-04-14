@@ -44,24 +44,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
                 listaclubUnicos();
                 break;
         }
+    }else{
+        echo "no hay lista";
+        header("HTTP/1.1 406 Not Acceptable");
     }
-    // try {
-    //     $sql = "SELECT * FROM usuario WHERE 1";
-    //     $result = $con->query($sql);
-    //     //comprovamos que alla resultado
-    //     // if($result->num_rows == 0 ){
-    //         //     header("HTTP/1.1 406 Not Acceptable");
-    //         // }else{
-    //         // }
-    //         $usuario = $result->fetch_all(MYSQLI_ASSOC);
-    //         print_r($sql);
-    //         echo json_encode($usuario);
-    //     }
-    //     catch (mysqli_sql_exception $e) {
-    //          // echo $e;
-            header("HTTP/1.1 500 Internal Server Error");
-    //     }
-    // exit;
 }
 //Recojemos todas la peticiones POST
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -83,6 +69,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 //  echo" \n crear monitor";
             }else if ($datos->tipeRol == "director"){
                 crearDirector($datos);
+                // echo" \n crear director";
+            }else if ($datos->tipeRol == "familiar"){
+                crearFamiliar($datos);
                 // echo" \n crear director";
             }else if ($datos->tipeRol == "login"){
                 login($datos);
@@ -173,7 +162,7 @@ function login($datos){
         $nomUsu = $datos->nom_usu;
         $passUsu = $datos->pass_usu;
         $hashPass = hash('sha512', $passUsu);
-        $sql = "SELECT * FROM `usuario` WHERE 1 AND nom_usu LIKE '$nomUsu' AND pass_usu LIKE '$hashPass'";
+        $sql = "SELECT * FROM `usuarios` WHERE 1 AND nom_usu LIKE '$nomUsu' AND pass LIKE '$hashPass'";
         $result = $con->query($sql);
         // comprovamos que alla resultado
         if($result->num_rows != 0 ){ 
@@ -236,7 +225,7 @@ function crearDirector($datos){
         try{
             $id_u = $datos -> id_u;
             // lazamos un error
-            if(checkIdUserExsits($id)){ 
+            if(checkIdUserExsits($id_u)){ 
                 $club = $datos -> club;
                 $fecha_elec = $datos -> fecha_elec;
                 $sql = "INSERT INTO `director` (`id`, `id_u`, `club`, `fechaEleccion`) VALUES
@@ -303,18 +292,6 @@ function crearSocio($datos){
                 $fechNac = $datos->fechNac;
                 $fecha_inscrip = $datos->fecha_inscrip;
                 $familiares = $datos->familiares;
-                if(isset($familiares)){
-                    // print_r($familiares);
-                    if(count($familiares) == 0){
-                        header("HTTP/1.1 500 Internal Server Error");
-                        echo "no hay familiares";
-                        exit;
-                    }else{
-                        foreach($familiares as $familiar){
-                            crearFamiliar($familiar);
-                        }
-                    }
-                }
                 $sql = "INSERT INTO `socios` (`id`, `id_u`, `curso`, `colegio`, `observaciones`, `fechaNacimiento`, `fechaInscrip`) VALUES
                 (NULL, '$id_u', '$curso_s', '$colegio', '$observacines', '$fechNac', '$fecha_inscrip');";
 
@@ -341,10 +318,10 @@ function crearFamiliar($datos){
         try {
             $id_u = $datos->id_u;
             $id_s = $datos->id_s;
-            if(checkIdUserExsits($id_u) && checkIdSocioExsits($id_u)){
+            if(checkIdUserExsits($id_u) && checkIdSocioExsits($id_s)){
                 echo "creo familiar";
-                $direccion = $datos->direccion;
-                $localidad = $datos->localidad;
+                $direccion = $datos->dir;
+                $localidad = $datos->loc;
                 $cp = $datos->cp;
                 $parentesco = $datos->parentesco;    
                 $sql = "INSERT INTO `familiares` (`id`, `id_u`, `id_s`, `direccion`, `localidad`, `cp`, `parentesco`)
@@ -355,7 +332,7 @@ function crearFamiliar($datos){
                 echo json_encode($con->insert_id);
                 return $con->insert_id;
             }else{
-            // echo "id no exixte";
+            echo "id no exixte";
             header("HTTP/1.1 406 Not Acceptable");
             }
     
@@ -403,27 +380,31 @@ function listaUsuarios($id_u = 0){
 }
 function listaDirectores($id_d = 0){
     $con = new Conexion();
+    $sql = "SELECT * FROM `director` WHERE 1";
+    // print_r($_GET);
     if(isset($_GET['club'])){
+        echo "club";
         $club = $_GET['club'];
+        $sql = "SELECT * FROM director WHERE club LIKE '%$club%'; ";
     }
     if(isset($_GET['id_d'])){
+        echo "id_d";
         $id_d = $_GET['id_d'];
+        $sql = "SELECT * FROM `director` WHERE 1 AND id = $id_d";
     }
+    if(isset($_GET['nombre'])){
+        // echo "nombres";
+        $sql = "SELECT director.id, nom, apel1 FROM `director`INNER JOIN usuarios on director.id_u = usuarios.id WHERE 1; ";
+    }
+    // echo "director";
     if(checkDirector()){
         try{
-            if($id_d > 0){
-                $sql = "SELECT * FROM `director` WHERE 1 AND id_d = $id_d";
-            }else if($club){
-                $sql = "SELECT * FROM director WHERE club LIKE '%$club%'; ";
-            }else{
-                $sql = "SELECT * FROM `director` WHERE 1";
-            }
             // echo $sql;
             $result = $con->query($sql);
             $director = $result->fetch_all(MYSQLI_ASSOC);
             echo json_encode($director);
         }catch (mysqli_sql_exception $e) {
-             // echo $e;
+            echo $e;
             header("HTTP/1.1 500 Internal Server Error");
         }
     }else {
@@ -452,27 +433,37 @@ function listaclubUnicos(){
 function listaSocios($id_s = 0){
     $con = new Conexion();
     if(checkDirector() || checkMonitor()){
-        // SELECT * FROM familiar WHERE id_s = 2; 
-        if(isset($_GET['id_socio'])){
-            $id_s = $_GET['id_socio'];
-            $sql = "SELECT * FROM `socios` WHERE 1 AND id_s = $id_s";
-        }else if(isset($_GET['curso'])){
-            $curso = $_GET['curso'];
-            $sql = "SELECT * FROM `socios` WHERE 1 AND socios.curso_s LIKE '$curso'";
-        }else{
-            $sql = "SELECT * FROM `socios` WHERE 1";
+        if(isset($_GET['nombres'])){
+            // echo "nombre";
+            listaSociosNombres();
         }
+        // else{
+        //     // SELECT * FROM familiar WHERE id_s = 2; 
+        //     if(isset($_GET['id_socio'])){
+        //         $id_s = $_GET['id_socio'];
+        //         $sql = "SELECT * FROM `socios` WHERE 1 AND id_s = $id_s";
+        //     }else if(isset($_GET['curso'])){
+        //         $curso = $_GET['curso'];
+        //         $sql = "SELECT * FROM `socios` WHERE 1 AND socios.curso_s LIKE '$curso'";
+        //     }else{
+        //         $sql = "SELECT * FROM `socios` WHERE 1";
+        //     }
+        // }
+        // try{
+        //     $result = $con->query($sql);
+        //     $socios = $result->fetch_all(MYSQLI_ASSOC);
+        //     echo json_encode($socios);
+        // }catch (mysqli_sql_exception $e) {
+        //      echo $e;
+        //     header("HTTP/1.1 500 Internal Server Error");
+        // }
+    }
+}
+function listaSociosNombres(){
+    $con = new Conexion();
+    $sql = "SELECT socios.id, usuarios.nom, usuarios.apel1 FROM `socios` INNER JOIN usuarios ON socios.id_u = usuarios.id WHERE 1; ";
+    if(checkDirector() || checkMonitor()){
         try{
-            // // echo "ID DEL USUARIO $id_s";
-            // // $sql = "SELECT * FROM `socios` WHERE 1";
-            // if($id_s > 0){
-            //     $sql = "SELECT * FROM `socios` WHERE 1 AND id_s = $id_s";
-            // }else if($curso_s == ""){
-            //     $sql = "SELECT * FROM `socios` WHERE 1 AND socios.curso_s LIKE '4epo'";
-            // }else{
-            //     $sql = "SELECT * FROM `socios` WHERE 1";
-            // }
-            // echo $sql;
             $result = $con->query($sql);
             $socios = $result->fetch_all(MYSQLI_ASSOC);
             echo json_encode($socios);
