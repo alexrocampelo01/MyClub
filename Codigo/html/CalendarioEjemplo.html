@@ -5,44 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-  <style>
-    table {
-      border-collapse: collapse;
-      border: red solid 2px;
-    }
-
-    td,
-    th {
-      border: 1px solid black;
-      padding: 3px;
-      text-align: center;
-      min-width: 10%;
-      min-height: 10%;
-    }
-
-    th {
-      font-weight: bold;
-      background-color: #E6E6E6;
-    }
-    span {
-      background-color: aqua;
-      width: 100%;
-    }
-    .dayWhitActivity{
-      display: flex;
-      flex-direction: row;
-    }
-    .spanActividad{
-      background-color: lightblue;
-      border-radius: 2vh;
-    }
-    #ListaActividades{
-      border: palegoldenrod;
-    }
-    .actividad{
-      border: black;
-    }
-  </style>
+    <link rel="stylesheet" href="../css/calendario.css">
 </head>
 
 <body>
@@ -51,239 +14,80 @@
     <a href="Listas.html">Listas</a>
     <a href="CalendarioEjemplo.html">Calendarios</a>
   </nav>
-
-  <div id="infoCalendario">
-    <span id="restarMes"> &lt; </span>
-    <span id="mesCalendario"> </span>
-    <span id="sumarMes"> &gt; </span>
-    <div id="calendar"></div>
-    <div id="ListaActividades">
-      <div class ="actividad"></div>
+  <div id="contenido">
+    <div id="divContenidoCalendario">
+      <div id="infoCalendario">
+        <span id="restarMes"> &lt; </span>
+        <span id="mesCalendario"> </span>
+        <span id="sumarMes"> &gt; </span>
+  
+        <div id="calendar"></div>
+  
+      </div>
+  
+      <div id="ListaActividades">
+        <div class ="actividad">
+          <div class="tituloAct"><h4>futbol</h4></div>
+          <div class="infoAct">
+            <p>curso: 4epo</p>
+            <p>Lugar: Campo de futbol</p>
+        </div>
+      </div>
+    </div>
+  <div class="otrascosas">
+    <span id="errores">ERORRES </span>
+  
+  
+    <!-- Botón para abrir la ventana modal -->
+    <button id="abrirModal">Crear Actividad</button>
+  
+    <!-- La ventana modal -->
+    <div id="miModal" class="modal">
+      <!-- Contenido de la ventana modal -->
+      <div class="modal-content">
+        <span id="cerrarModal">&times;</span>
+        <form id="formActividad">
+          <label for="monitor">motores</label>
+          <select name="monitor" id="monitor"></select>
+      
+          <label for="curso">Curso de los participantes</label>
+          <select name="curso" id="curso">
+              <option value="4EPO">4º EPO</option>
+              <option value="5EPO">5º EPO</option>
+              <option value="6EPO">6º EPO</option>
+              <option value="1ESO">1º ESO</option>  
+              <option value="2ESO">2º ESO</option>
+          </select><br>
+      
+          <label for="titulo">Título:</label>
+          <input type="text" id="titulo" name="titulo">
+      
+          <label for="fechStart">Fecha y hora de inicio:</label>
+          <input type="datetime-local" id="fechStart" name="fechStart">
+      
+          <label for="fechEnd">Fecha y hora de finalización:</label>
+          <input type="datetime-local" id="fechEnd" name="fechEnd">
+      
+          <label for="lugar">Lugar:</label>
+          <input type="text" id="lugar" name="lugar">
+      
+          <label for="descripcion">Descripción:</label>
+          <textarea id="descripcion" name="descripcion"></textarea>
+      
+          <label for="material">Material:</label>
+          <input type="text" id="material" name="material">
+          <br>
+          <span id="butCrearActividad">Crear Actividad</span>
+          <span id="butModificaActividad" class="ocultar">Modificar Actividad</span>
+        </form>
+      </div>
     </div>
   </div>
-  <div id="calendario"></div>
-  <span id="errores">
-    
-  </span>
+  </div>
+
   
-  <script>
-    let elementDomListaActividades = document.querySelector('#ListaActividades');
-    let listaActividades = [];
-    let urlLocal = 'http://localhost/Myclub/Codigo/php/'
-    //declaramos variables inicializo el dia
-    let hoy = new Date();
-    var dia = hoy.getDate();
-    var mes = hoy.getMonth() + 1; // Nota: ¡Los meses en JavaScript van de 0 a 11!
-    var año = hoy.getFullYear();
-    console.log(`[HOY] ${año}- ${mes} - ${dia}`);
-
-    let textoMesCalendario = document.querySelector('#mesCalendario');
-    
-    createCalendar(calendar, año, mes);
-
-    let sumarMes = document.querySelector('#sumarMes');
-    sumarMes.addEventListener('click', anadirMes);
-    function anadirMes(){
-      console.log("+");
-      mes ++;
-      comprobacionMes(mes);
-      createCalendar(calendar, año, mes);
-    }
-    let restarMes= document.querySelector('#restarMes');
-    restarMes.addEventListener('click', disminuirMes);
-    function disminuirMes(){
-      console.log("-");
-      mes--;
-      comprobacionMes(mes);
-      createCalendar(calendar, año, mes);
-    }
-    // function crearClendario2(){
-
-    // let divCalendario = document.querySelector('#calendario');
-    // let tableConJS = document.createElement('table');
-    // tableConJS.innerHTML = "<tr><th>MO</th><th>TU</th><th>WE</th><th>TH</th><th>FR</th><th>SA</th><th>SU</th></tr><tr>"
-    //   divCalendario.append(tableConJS);
-    // }
-
-    async function createCalendar(elem, year, month) {
-
-      console.log(`[CREACION CALENDARIO] ${year} - ${month}`);
-
-      let nombresMesesEspañol = ["Enero",  "Febrero",  "Marzo",  "Abril",  "Mayo",  "Junio",  "Julio",  "Agosto",  "Septiembre",  "Octubre",  "Noviembre",  "Diciembre"];
-      let ano = year; 
-      let mon = month - 1; // los meses en JS son 0..11, no 1..12
-      let d = new Date(year, mon);
-
-
-      textoMesCalendario.textContent = nombresMesesEspañol[d.getMonth()] + ` ${ano}`;
-      let table = '<table><tr><th>MO</th><th>TU</th><th>WE</th><th>TH</th><th>FR</th><th>SA</th><th>SU</th></tr><tr>';
-      //comprobacion de cambio de año
-
-      // Obtener el primer día del mes
-      var primerDia = new Date(d.getFullYear(), mes -1, 1);
-      
-      // Obtener el último día del mes
-      var ultimoDia = new Date(d.getFullYear(), mes, 0);
-      // obtenemos la lista de actividades de este mes
-      listaActividades = await getActividadesList(convertirDateATextoSQL(primerDia),convertirDateATextoSQL(ultimoDia));
-      console.log(`[Lista de Actividades]`, listaActividades);
-      
-       
-      // espacios en la primera línea
-      // desde lunes hasta el primer día del mes
-      // * * * 1  2  3  4
-      for (let i = 0; i < getDay(d); i++) {
-        table += '<td></td>';
-      }
-
-      // <td> con el día  (1 - 31)
-      while (d.getMonth() == mon) {
-        table += `<td class="dayWhitActivity" date-fecha='${convertirDateATextoSQL(d)}'> ${d.getDate()}`;
-        let actividadesHoy = await obtenerActividadesPorFecha(listaActividades, d);
-        if(actividadesHoy.length > 0){
-          console.log(`[activiadesHOY]`, actividadesHoy);
-          table += `<span class="spanActividad">${actividadesHoy.length}</span>`;
-        }
-        table += `</td>`;
-        
-        if (getDay(d) % 7 == 6) { // domingo, último dia de la semana nueva línea
-          table += '</tr><tr>';
-        }
-
-        d.setDate(d.getDate() + 1);
-      }
-
-      // espacios después del último día del mes hasta completar la última línea
-      // 29 30 31 * * * *
-      if (getDay(d) != 0) {
-        for (let i = getDay(d); i < 7; i++) {
-          table += '<td></td>';
-        }
-      }
-
-      // cerrar la tabla
-      table += '</tr></table>';
-      elem.addEventListener('click', selcionarDia);
-
-      elem.innerHTML = table;
-      
-    }
-    function getDay(date) { // obtiene el número de día desde 0 (lunes) a 6 (domingo)
-      let day = date.getDay();
-      if (day == 0) day = 7; // hacer domingo (0) el último día
-      return day - 1;
-    }
-    
-    function comprobacionMes(mes){
-      console.log(`[MES] comprobae`, mes );
-      if(mes <= 0){
-        this.mes = 12;
-        this.año = this.año - 1;
-      }else if(mes > 11){
-        this.mes = 1;
-        this.año = this.año +1;
-      }
-    }
-        
-    function selcionarDia(e){
-      console.log(`clicado el dia`);
-      console.log('elemeto', e.target);
-      console.log('atrivuto', e.target.getAttribute("date-fecha"));
-      let fecha = convertirDateATextoSQL(e.target.getAttribute("date-fecha"));
-      if(listaActividades.length > 0){
-        let day = new Date(e.target.getAttribute("date-fecha"))
-        let activiades = obtenerActividadesPorFecha(listaActividades, day);
-        elementDomListaActividades.innerHTML = "";
-        activiades.forEach((actividad)=>{
-          let divActividadLista = document.createElement('div');
-          let spanTitle = document.createElement('span');
-          console.log(`creando lista`, actividad);
-          spanTitle.textContent = actividad.titulo;
   
-          divActividadLista.append(spanTitle);
-          elementDomListaActividades.append(divActividadLista);
-        })
-      }
-    }
-    function crearLista(activiades){
-      activiades.forEach((actividad) =>{
-        
-      })
-
-    }
-    function convertirDateATextoSQL(fecha) {
-
-      let date = new Date(fecha);
-      // console.log(date);
-      let year = date.getFullYear();
-      let month = (date.getMonth() + 1).toString().padStart(2, '0');
-      let day = date.getDate().toString().padStart(2, '0');
-      let hours = date.getHours().toString().padStart(2, '0');
-      let minutes = date.getMinutes().toString().padStart(2, '0');
-      let seconds = date.getSeconds().toString().padStart(2, '0');
-
-      let formatoSQL = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-
-      return formatoSQL;
-    }
-
-    async function getActividadesList(startDate, endDate){
-      // console.log(`[URL] ${urlLocal}actividades.php?lista=rangoFechas&filtro=${startDate},${endDate}`)
-      let listaActividades = fetch(`${urlLocal}actividades.php?lista=rangoFechas&filtro=${startDate},${endDate}`, {
-          method:'GET',
-          headers: {
-            webToken: `${localStorage.getItem('jwt')}`,
-          },
-      })
-      .then(response => {
-        // console.log(response.status);
-        switch(response.status){
-            case 200:
-                console.log("que pasa",response);
-                console.log("200");
-                return response.json();
-            case 201:
-              console.log("201");
-                document.querySelector('#errores').innerHTML=`cargadas activiades`;
-                return response.json();
-            case 404:
-                document.querySelector('#errores').innerHTML=`Sql excepcion`;
-                break;
-            case 406:
-                console.log("usario ya usado");
-                document.querySelector('#errores').innerHTML=`usuario repetido`;
-                break;
-            case 401:
-                console.log("no tienes permiso");
-                document.querySelector('#errores').innerHTML=`no tienes permiso`;
-                break;
-            default:
-                document.querySelector('#errores').innerHTML=`error intentelo mas tarde`;
-                console.log("defecto");
-                break;
-        }
-      })
-      .then((data) => {
-          console.log("paos por aqui");
-          console.log("data", data);
-          return data;
-          // console.log("lista activiades", listaActividades);
-        })
-        return listaActividades;
-    }
-    
-    function obtenerActividadesPorFecha(listaActividades, fecha) {
-      return listaActividades.filter(function(actividad) {
-        let fechaActividad = new Date(actividad.fechaHora);
-        console.log(`${fechaActividad} === ${fecha}`)
-        return fechaActividad.getDate() === fecha.getDate() &&
-               fechaActividad.getMonth() === fecha.getMonth() &&
-               fechaActividad.getFullYear() === fecha.getFullYear();
-    });
-}
-
-    
- </script> -->
+<script src="../js/calendario.js"></script>
 
 
 </body>

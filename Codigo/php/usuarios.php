@@ -475,16 +475,19 @@ function listaSociosNombres(){
 }
 function listaMonitores(){
     $con = new Conexion();
+    // print_r($_GET);
     if(isset($_GET['id_monitor'])){
         $id_m = $_GET['id_monitor'];
         $sql = "SELECT * FROM `monitor` WHERE 1 and id_m = $id_m;";
     }else if(isset($_GET['curso'])){
         $curso = $_GET['curso'];
         $sql = "SELECT * FROM `monitor` WHERE 1 and curso_m like '$curso'";
-    }else{
+    }else if(isset($_GET['nombres'])){
+        $sql = "SELECT monitores.id, usuarios.nom, usuarios.apel1 FROM `monitores` INNER JOIN usuarios ON monitores.id_u = usuarios.id WHERE 1; ";
+    }
+    else{
         $sql = "SELECT * FROM `monitor` WHERE 1";
     }
-
     if(checkDirector() || checkMonitor()){
 
         try{
@@ -494,6 +497,7 @@ function listaMonitores(){
             $monitores = $result->fetch_all(MYSQLI_ASSOC);
             echo json_encode($monitores);
         }catch (mysqli_sql_exception $e) {
+            $e;
             header("HTTP/1.1 406 Not Acceptable");
         }
     }else{
