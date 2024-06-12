@@ -1,0 +1,60 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+.profile button {
+    background-color: rgba(32, 117, 64, 1);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.imagenInicial{
+    background-image: url('../../Img/logoMyclub.png');
+    width: 99%;
+    height: 50vh;
+}
+.explicion{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: rgba(16, 95, 46, 1);
+    color: white;
+    width: auto;
+}
+.tituloExplicacion{
+    width: 100%;
+    background-color: rgb(232, 169, 106);
+}
+.textoExplicacion{
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    padding: 10px 20px;
+    background-color: rgb(108, 106, 232);
+    color: white;
+    width: auto;
+
+}
+.textoExplicacion p{
+    width: 55%;
+    height: 60%;
+    background-color: rgb(17, 17, 39);
+
+}
+.textoExplicacionImg img{
+    width: 40%;
+    height: 40%;
+    background-color: rgb(17, 17, 39);
+}
+/* 
+$old-gold: rgba(189, 166, 40, 1);
+$pakistan-green: rgba(0, 73, 28, 1);
+$dark-spring-green: rgba(32, 117, 64, 1);
+$dartmouth-green: rgba(16, 95, 46, 1); 
+$pakistan-green-2: rgba(0, 73, 28, 1); // mas oscuro
+*/

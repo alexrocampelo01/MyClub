@@ -1,0 +1,44 @@
+body{
+    margin: 0px;
+}
+#formularioLog{
+    background-color:rgba(32, 117, 64, 1);
+    width: 300px;
+    height: auto;
+    margin: 0 auto;
+    margin-top: 100px;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+#formularioLog input{
+    margin: 10px;
+    padding: 5px;
+    border-radius: 5px;
+    border: none;
+}
+#formularioLog label{
+    margin: 5px;
+    color: white ;
+}
+#formularioLog span{
+    margin: 10px;
+    padding: 5px;
+    border-radius: 5px;
+    border: none;
+    background-color: #E2B122ff;
+    color: white;
+    cursor: pointer;
+}
+.campoInvalido{
+    border: 2px solid #E75127ff;
+}
+#divErrores{
+    text-align: center;
+    margin: 20px;
+}
+#divErrores span{
+    background-color: rgba(231, 81, 39, 0.548);
+}

@@ -5,33 +5,28 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="../css/cabecera.css">
     <link rel="stylesheet" href="../css/calendario.css">
 </head>
 
 <body>
-  <nav>
-    <a href="index.html">INDEX</a>
-    <a href="Listas.html">Listas</a>
-    <a href="CalendarioEjemplo.html">Calendarios</a>
-  </nav>
+  <div id="cabecera"></div>
   <div id="contenido">
     <div id="divContenidoCalendario">
       <div id="infoCalendario">
         <span id="restarMes"> &lt; </span>
         <span id="mesCalendario"> </span>
         <span id="sumarMes"> &gt; </span>
-  
-        <div id="calendar"></div>
-  
       </div>
-  
+      <div id="calendario">
+      </div>  
+    </div>
       <div id="ListaActividades">
-        <div class ="actividad">
-          <div class="tituloAct"><h4>futbol</h4></div>
-          <div class="infoAct">
-            <p>curso: 4epo</p>
-            <p>Lugar: Campo de futbol</p>
+        <div id="infoLista">
+          <span class="infoDia"></span>
         </div>
+        <div class ="actividad">
+
       </div>
     </div>
   <div class="otrascosas">
@@ -83,12 +78,10 @@
       </div>
     </div>
   </div>
+
   </div>
-
-  
-  
-<script src="../js/calendario.js"></script>
-
-
 </body>
+<script src="../Js/permisos.js"></script>
+<script src="../Js/cargaDinamica.js"></script>
+<script src="../js/calendario.js"></script>
 </html>

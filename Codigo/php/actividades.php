@@ -26,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
                 $fechaHora = $filtro -> fechaHora;
                 $curso = $filtro -> curso;
                 $sql = "SELECT * FROM `actividades` WHERE 1 and fechaHora = '$fechaHora' and curso_ac LIKE '$curso';";
-
             }else{
                 $sql = "SELECT * FROM `actividades` WHERE 1 ";
             }

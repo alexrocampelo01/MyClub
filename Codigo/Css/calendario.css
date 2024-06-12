@@ -1,26 +1,55 @@
-table {
-  border-collapse: collapse;
-  border: red solid 2px;
+body{
+  margin: 0;
 }
-
-td,
-th {
-  border: 1px solid black;
-  padding: 3px;
-  text-align: center;
-  min-width: 10%;
-  min-height: 10%;
-}
-
-th {
-  font-weight: bold;
-  background-color: #E6E6E6;
-}
-
-/* .dayWhitActivity{
+#contenido {
+  width: 100%;
   display: flex;
-  flex-direction: row;
-} */
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  background-color: magenta;
+}
+#divContenidoCalendario{
+  width: 49%;
+  height: 500px;
+  background-color: lightgreen;
+  border: black solid 2px;
+}
+#infoCalendario{
+  align-items: center;
+  text-align: center;
+  background-color: lightblue;
+  height: 50px;
+  font-size: larger;
+}
+#restarMes{
+  background-color: chocolate;
+  margin: 5px;
+}
+#sumarMes{
+  background-color: chocolate;
+  margin: 5px;
+}
+#calendario{
+  width: auto;
+  height: 450px;
+  background-color: gold;
+  margin: 0;
+  text-align: center;
+}
+#calendario table{
+  height: 100%;
+  width: 100%;
+  background-color: firebrick;
+  margin: 0;
+}
+#calendario tr{
+  width: 100px;
+  background-color: blueviolet;
+  margin: 0;
+  flex: auto;
+  flex-direction: column;
+}
 .spanActividad{
   background-color: lightblue;
   border-radius: 2vh;
@@ -31,20 +60,19 @@ th {
 .actividad{
   border: black;
 }
-#divContenidoCalendario {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
-
-#infoCalendario {
-  flex: 1;
-  border: black solid 2px;
-}
 
 #ListaActividades {
+  width: 49%;
+  height: 500px;
   border: black solid 2px;
-  flex: 1;
+  background-color: lightcoral;
+  overflow: auto;
+}
+.actividadLista{
+background: red;
+margin: 10px;
+flex: auto;
+
 }
 .otrascosas{
   border: black solid 2px;
@@ -52,39 +80,74 @@ th {
   justify-content: space-between;
   flex-wrap: wrap;
 }
+
 .actividad{
   border: blue solid 2px;
+  background-color: lightblue;
   margin: 5px;
   width: 90%;
-}
-form{
-  margin-left: 30px;
-  width: 25%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  vertical-align: auto;
-  background-color: crimson;
 }
 /* Estilos para la ventana modal */
 .modal {
   display: none; /* La ventana modal está oculta por defecto */
   position: fixed; /* La ventana modal se queda fija en la pantalla */
   z-index: 1; /* La ventana modal se sitúa encima del resto de contenido */
-  left: 0;
+  margin: 0;
   top: 0;
   width: 100%; /* La ventana modal ocupa toda la pantalla */
-  height: 100%;
+  height: auto;
+  align-items: center;
   overflow: auto; /* Habilita el scroll si es necesario */
-  background-color: rgba(0,0,0,0.4); /* Color de fondo con opacidad */
+  background-color: rgba(14, 1, 1, 0.785); /* Color de fondo con opacidad */
 }
 /* Estilos para el contenido de la ventana modal */
 .modal-content {
-  background-color: #fefefe;
-  margin: 15% auto; /* 15% desde arriba y centrado */
+  background-color:rgba(32, 117, 64, 1);
+  margin: 10% auto; /* 15% desde arriba y centrado */
   padding: 20px;
   border: 1px solid #888;
-  width: 80%; /* El contenido de la ventana modal ocupa el 80% de la pantalla */
+  width: 50%; /* El contenido de la ventana modal ocupa el 80% de la pantalla */
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  border: 2px solid rgba(32, 117, 64, 1);
+}
+#formActividad{
+  width: 300px;
+  height: auto;
+  margin: 0 auto;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+#formActividad label{
+  margin: 5px;
+  color: white ;
+}
+#formActividad input{
+  margin: 5px;
+  padding: 2px;
+  border-radius: 5px;
+  border: none;
+}
+#butCrearActividad, #butModificaActividad {
+    margin: 10px;
+    padding: 5px;
+    border-radius: 5px;
+    border: none;
+    background-color: #E2B122ff;
+    color: white;
+    cursor: pointer;
+}
+#cerrarModal{
+  /* background-color: greenyellow; */
+  position: absolute;
+  left: 10px;
+  top: 10px;
 }
 .ocultar{
   display: none;

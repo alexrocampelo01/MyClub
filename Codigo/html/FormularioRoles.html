@@ -5,39 +5,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Form de roles</title>
-    <style>
-        span{
-            border: 5px solid black;
-            margin: 20px;
-            padding: 5px;
-            background-color: aqua;
-        }
-        form{
-            margin-left: 30px;
-            width: 100px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            vertical-align: auto;
-        }
-        #formulario{
-            background-color: chartreuse;
-            width: 50%;
-        }
-        .esconder{
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" href="../Css/formulariosUsuarios.css">
 </head>
 
 <body>
     <a href="index.html">INDEX</a>  
-    <form id="formulario" name="log">
+    <form id="formularioLog" name="log">
         <label for="nom_log">Nombre de Usuario</label>
-        <input type="text" name="nom_log" id="nom_log">
+        <input type="text" name="Nombre" id="nom_log">
 
         <label for="pass_log">Contraseña de usuario</label>
-        <input type="text" name="pass_log" id="pass_log">
+        <input type="password" name="Contraseña" id="pass_log">
+        <span id="verPass">ver</span>
 
         <span id="butLog">Logearme</span>
     </form>

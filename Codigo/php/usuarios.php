@@ -1,12 +1,12 @@
 <?php
 //aparatdo de decraraciones he inportaciones
-require_once('../php/permisos.php');
+require_once('../php/permisos.php'); // importamos el php encargado de los permisos
 
 
 // indicamos la declaracion de variables grovales y importacion de recursos
 require_once('conet.php');
 $con = new Conexion();
-
+//
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     // echo "esto es un get";
     if(isset($_GET['lista'])){
@@ -14,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         // echo $lista;
         switch($lista){
             case 'usuarios':
+                // echo "lista de usuarios";
                 listaUsuarios();
                 break;
             case 'directores':
@@ -24,20 +25,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
                 break;
             case 'socios':
                 // echo "lista de socios";
-                if(isset($_GET['id_socio'])){
-                    // echo $_GET['id_socio'];
-                    listaSocios($_GET['id_socio']);
-                }else{
-                    listaSocios();
-                }
+                listaSocios();
                 break;
             case 'familiares':
-                familiaresDelSocio($_GET['id_socio']);
-                echo "lista de socios";
-                break;
-            case 'responsable':
-                // echo "lista de responsable";
-                responsableMonitor();
+                // echo "lista de familiares";
+                listaFamiliares();
                 break;
             case 'clubNombres':
                 // echo "lista de responsable";
@@ -50,30 +42,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     }
 }
 //Recojemos todas la peticiones POST
+//relacionadas con la creacion de nuevos suarios
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    //recogemos el contenido del body de la peticion
     $json = file_get_contents('php://input');
+    //como usamao el protocolo de envio de datos JSON
+    //decodificamos el JSON recivido
     $datos = json_decode($json);
+    //comprobamos que el JSON seha valido sicno debolmeos un error
     if ($datos === null) {
         echo "JSON no valido";
         header("HTTP/1.1 406 Not Acceptable");
     }else{
         // print_r($datos);
-        if(isset($datos->tipeRol)){
-            if($datos->tipeRol == "usuario"){
+        // enfuncion de la variable requiero a una funcion distinta
+        // crearUsuario($datos);
+        if(isset($datos->tipeform)){
+            if($datos->tipeform == "usuario"){
                 crearUsuario($datos);
-            }else if($datos->tipeRol == "socio"){
-                crearSocio($datos);
-                // echo" \n crear socio";
-            }else if ($datos->tipeRol == "monitor"){
-                crearMonitor($datos);
-                //  echo" \n crear monitor";
-            }else if ($datos->tipeRol == "director"){
-                crearDirector($datos);
-                // echo" \n crear director";
-            }else if ($datos->tipeRol == "familiar"){
-                crearFamiliar($datos);
-                // echo" \n crear director";
-            }else if ($datos->tipeRol == "login"){
+            }else if ($datos->tipeform == "login"){
                 login($datos);
             }else{
                 echo" \n formulario no registrado";
@@ -155,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
         echo "otro usarios $datos->tipo_user";
     }
 }
-
+// realizamos el login 
 function login($datos){
     $con = new Conexion();
     try {
@@ -167,16 +154,16 @@ function login($datos){
         // comprovamos que alla resultado
         if($result->num_rows != 0 ){ 
             $usario = $result->fetch_all(MYSQLI_ASSOC);
-            //print_r($usario);
+            // print_r($usario);
             $jwt = generateWebToken($usario[0]['tipo_user'],$usario[0]['nom_usu']);
             echo json_encode($jwt);
         }else{
-            echo "no hay usario con esos datos";
+            // echo "no hay usario con esos datos";
             header("HTTP/1.1 406 Not Acceptable");
             
         } 
     }catch (mysqli_sql_exception $e) {
-        echo $e;
+        // echo $e;
         header("HTTP/1.1 500 Internal Server Error");
     }
 }
@@ -202,12 +189,27 @@ function crearUsuario($datos){
                 $correo = $datos->correo;
                 $tlf = $datos->tlf;
                 $tipo_user = $datos->tipo_user;
+                $rol = $datos->rol;
                 $sql = "INSERT INTO `usuarios` (`id`, `nom_usu`, `pass`, `nom`, `apel1`, `apel2`, `correo`, `tlf`, `tipo_user`) VALUES
                 (NULL, '$nomUsu', '$hashPass', '$nom', '$apel1', '$apel2', '$correo', '$tlf', '$tipo_user')";
                 // echo $sql;
                 $con->query($sql);
                 header("HTTP/1.1 201 Created");
-                echo json_encode($con->insert_id);
+                $idUsu = $con->insert_id;
+                print_r($rol);
+                if($rol->tipeRol == "socio"){
+                    crearSocio($datos);
+                    // echo" \n crear socio";
+                }else if ($rol->tipeRol == "monitor"){
+                    crearMonitor($datos);
+                    //  echo" \n crear monitor";
+                }else if ($rol->tipeRol == "director"){
+                    crearDirector($datos);
+                    // echo" \n crear director";
+                }else if ($rol->tipeRol == "familiar"){
+                    crearFamiliar($datos);
+                    // echo" \n crear director";
+                }              
             } 
         }catch (mysqli_sql_exception $e) {
             // echo $e;
@@ -363,14 +365,14 @@ function listaUsuarios($id_u = 0){
             }else if(isset($club)){
                 $sql = "SELECT * FROM `usuario` WHERE 1";
             }else{
-                $sql = "SELECT * FROM `usuario` WHERE 1";
+                $sql = "SELECT * FROM `usuarios` WHERE 1";
             }
             // echo $sql;
             $result = $con->query($sql);
             $socios = $result->fetch_all(MYSQLI_ASSOC);
             echo json_encode($socios);
         }catch (mysqli_sql_exception $e) {
-             // echo $e;
+             echo $e;
             header("HTTP/1.1 500 Internal Server Error");
         }
     }else {
@@ -380,7 +382,7 @@ function listaUsuarios($id_u = 0){
 }
 function listaDirectores($id_d = 0){
     $con = new Conexion();
-    $sql = "SELECT * FROM `director` WHERE 1";
+    $sql =  $sql = "SELECT * FROM `director` INNER JOIN `usuarios` ON director.id_u = usuarios.id WHERE 1;";
     // print_r($_GET);
     if(isset($_GET['club'])){
         echo "club";
@@ -437,26 +439,22 @@ function listaSocios($id_s = 0){
             // echo "nombre";
             listaSociosNombres();
         }
-        // else{
-        //     // SELECT * FROM familiar WHERE id_s = 2; 
-        //     if(isset($_GET['id_socio'])){
-        //         $id_s = $_GET['id_socio'];
-        //         $sql = "SELECT * FROM `socios` WHERE 1 AND id_s = $id_s";
-        //     }else if(isset($_GET['curso'])){
-        //         $curso = $_GET['curso'];
-        //         $sql = "SELECT * FROM `socios` WHERE 1 AND socios.curso_s LIKE '$curso'";
-        //     }else{
-        //         $sql = "SELECT * FROM `socios` WHERE 1";
-        //     }
-        // }
-        // try{
-        //     $result = $con->query($sql);
-        //     $socios = $result->fetch_all(MYSQLI_ASSOC);
-        //     echo json_encode($socios);
-        // }catch (mysqli_sql_exception $e) {
-        //      echo $e;
-        //     header("HTTP/1.1 500 Internal Server Error");
-        // }
+        else{
+            if(isset($_GET['id_s'])){
+                $id_s = $_GET['id_s'];
+                $sql = "SELECT * FROM `socios` WHERE 1 AND id = $id_s";
+            }else{
+                $sql = "SELECT * FROM `socios` INNER JOIN `usuarios` ON socios.id_u = usuarios.id WHERE 1;";
+            }
+        }
+        try{
+            $result = $con->query($sql);
+            $socios = $result->fetch_all(MYSQLI_ASSOC);
+            echo json_encode($socios);
+        }catch (mysqli_sql_exception $e) {
+             echo $e;
+            header("HTTP/1.1 500 Internal Server Error");
+        }
     }
 }
 function listaSociosNombres(){
@@ -486,7 +484,7 @@ function listaMonitores(){
         $sql = "SELECT monitores.id, usuarios.nom, usuarios.apel1 FROM `monitores` INNER JOIN usuarios ON monitores.id_u = usuarios.id WHERE 1; ";
     }
     else{
-        $sql = "SELECT * FROM `monitor` WHERE 1";
+        $sql = "SELECT * FROM `monitores` INNER JOIN `usuarios` ON usuarios.id = monitores.id_u WHERE 1";
     }
     if(checkDirector() || checkMonitor()){
 
@@ -504,29 +502,7 @@ function listaMonitores(){
         header("HTTP/1.1 401 Unauthorized");
     }
 }
-function responsableMonitor(){
-    $con = new Conexion();
-    // SELECT nom_d, apel1_d, apel2_d FROM monitor INNER JOIN director on monitor.id_d = director.id_d;
-    if(isset($_GET['id_m'])){
-        $idMonitor = $_GET['id_m'];
-        if(checkDirector() || checkMonitor()){
-            try{
-                // echo $sql;
-                $sql = "SELECT nom_d, apel1_d, apel2_d FROM monitor INNER JOIN director on monitor.id_d = director.id_d WHERE 1 AND id_m = $idMonitor";
-                $result = $con->query($sql);
-                // print_r($result);
-                $responsable = $result->fetch_all(MYSQLI_ASSOC);
-                echo json_encode($responsable);
-            }catch (mysqli_sql_exception $e) {
-                header("HTTP/1.1 402 Payment Required");
-            }
-        }else{
-            header("HTTP/1.1 401 Unauthorized");
-        }
-    }else{
-        header("HTTP/1.1 406 Not Acceptable");
-    }
-}
+
 function familiaresDelSocio($id_s = 0){
     $con = new Conexion();
     if(checkDirector() || checkMonitor() ){
@@ -547,6 +523,30 @@ function familiaresDelSocio($id_s = 0){
         }
     }
 }
+function listaFamiliares(){
+    $con = new Conexion();
+    if(checkDirector() || checkMonitor()){
+        try{
+            $sql = "SELECT * 
+            FROM `familiares` INNER JOIN `usuarios` ON usuarios.id = familiares.id_u 
+            INNER JOIN `socios` ON socios.id = familiares.id_s 
+            WHERE 1; ";
+            $result = $con->query($sql);
+            $familiares = $result->fetch_all(MYSQLI_ASSOC);
+            echo json_encode($familiares);
+        }catch (mysqli_sql_exception $e) {
+             // echo $e;
+            header("HTTP/1.1 500 Internal Server Error");
+        }
+    }else {
+        header("HTTP/1.1 401 Unauthorized");
+        echo "otro usarios $datos->tipo_user";
+    }
+
+}
+
+//------------------------------------------------------------------------
+
 // - Modificar
 function modificarUsuario($datos){
     $con = new Conexion();
@@ -578,7 +578,8 @@ function modificarUsuario($datos){
         echo "otro usarios $datos->tipo_user";
     }
 }
-// id_d 	id_u 	nom_d 	apel1_d 	apel2_d 	club 	fecha_eleccion 	
+
+
 function modificarDirector($datos){
     $con = new Conexion();
     echo "director";
@@ -654,6 +655,9 @@ function modificarMonitor($datos){
         echo "otro usarios $datos->tipo_user";
     }
 }
+/*
+*
+*/
 function modificarSocio($datos){
     $con = new Conexion();
     if(checkDirector()){

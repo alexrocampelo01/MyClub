@@ -1,0 +1,22 @@
+
+span {
+  background-color: aqua;
+  width: 100%;
+}
+.lista{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border: 5px solid black;
+}
+#crearUsuario{
+  position: fixed; /* Hace que el botón se mantenga en una posición específica incluso cuando se desplaza la página */
+  bottom: 20px; /* Posiciona el botón a 20px del borde inferior de la página */
+  right: 20px; /* Posiciona el botón a 20px del borde derecho de la página */
+  border-radius: 100%; /* Añade esquinas redondeadas al botón */
+  background-color: #4CAF50; /* Establece el color de fondo del botón */
+  width: 4%;
+  height: 5%;
+}

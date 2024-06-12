@@ -1,8 +1,11 @@
 console.log("calendario.js");
 let elementDomListaActividades = document.querySelector('#ListaActividades');
+
 let listaActividades = [];
 let urlLocal = 'http://localhost/Myclub/Codigo/php/'
+
 listaNombreMonitores();
+
 //declaramos variables inicializo el dia
 let hoy = new Date();
 var dia = hoy.getDate();
@@ -11,8 +14,8 @@ var año = hoy.getFullYear();
 console.log(`[HOY] ${año}- ${mes} - ${dia}`);
 
 let textoMesCalendario = document.querySelector('#mesCalendario');
-
-createCalendar(calendar, año, mes);
+let divCalendario = document.querySelector('#calendario');
+createCalendar(divCalendario, año, mes);
 
 let sumarMes = document.querySelector('#sumarMes');
 sumarMes.addEventListener('click', anadirMes);
@@ -20,7 +23,7 @@ function anadirMes(){
   console.log("+");
   mes ++;
   comprobacionMes(mes);
-  createCalendar(calendar, año, mes);
+  createCalendar(divCalendario, año, mes);
 }
 let restarMes= document.querySelector('#restarMes');
 restarMes.addEventListener('click', disminuirMes);
@@ -28,7 +31,7 @@ function disminuirMes(){
   console.log("-");
   mes--;
   comprobacionMes(mes);
-  createCalendar(calendar, año, mes);
+  createCalendar(divCalendario, año, mes);
 }
 // function crearClendario2(){
 
@@ -124,27 +127,33 @@ function seleccionarDia(e){
     elementDomListaActividades.innerHTML = "";
     activiades.forEach((actividad)=>{
       let divActividadLista = document.createElement('div');
+      divActividadLista.setAttribute('class', 'actividadLista');
       divActividadLista.setAttribute('id_C', `${actividad.id}`);
-
-      let spanTitle = document.createElement('span');
-      console.log(`creando lista`, actividad);
-      spanTitle.textContent = actividad.titulo;
-
-      let butModificar = document.createElement('button');
-      butModificar.textContent = "Modificar";
-      butModificar.setAttribute('id_C', `${actividad.id}`);
-      butModificar.addEventListener('click', modificarActividadLoad);
-
-      //añadiomos los elementos al DOM
-      spanTitle.append(butModificar);
-      divActividadLista.append(spanTitle);
+      divActividadLista.innerHTML = `    
+      <span>${actividad.titulo}</span>
+      <div>
+          <span>Curso: ${actividad.curso_ac}</span><br>
+          <span>Fecha: ${actividad.fechaHora_start} - ${actividad.fechaHora_end}</span>
+      </div>
+      <div>
+          <button idC="${actividad.id}" class="modificarAc">Modificar</button>
+          <button idC="${actividad.id}" class="eliminarAc">Eliminar</button>
+      </div>
+      `;
+      // console.log(`creando lista`, divActividadLista);
       elementDomListaActividades.append(divActividadLista);
+      document.querySelectorAll('.modificarAc').forEach((element)=>{element.addEventListener('click', modificarActividadLoad);})
+      document.querySelectorAll('.eliminarAc').forEach((element)=>{element.addEventListener('click', eliminarActividad);})
+
     })
   }
 }
-function modificarActividadLoad(){
-  console.log("modificar actividad", this.getAttribute('id_C'));
-  activiadad = listaActividades.find(actividad => actividad.id == this.getAttribute('id_C'));
+function modificarActividadLoad2(e){
+  console.log("modificar actividad", e.target.getAttribute('idc'));
+}
+function modificarActividadLoad(e){
+  console.log("modificar actividad", e.target.getAttribute('idc'));
+  activiadad = listaActividades.find(actividad => actividad.id == e.target.getAttribute('idc'));
   // console.log("actividad", activiadad);
   // abromos el modal y lo modificamos
   modal.style.display = "block";
@@ -213,7 +222,18 @@ function modificarActividad(e){
   }).then(data => {     
       console.log(data);
   });
-  }
+}
+function eliminarActividad(e){
+  console.log("eliminar actividad", e.target.getAttribute('idc'));
+  fetch(`${urlLocal}actividades.php`, {
+      method:'DELETE',
+      headers: {
+          'Content-Type': 'application/json;charset=utf-8',
+          'webToken' : sessionStorage.getItem('jwt'),
+      },
+      body: JSON.stringify({id: e.target.getAttribute('idc')})
+});
+}
 
 
 function convertirDateATextoSQL(fecha) {
@@ -311,6 +331,7 @@ function listaNombreMonitores(){
 //CREAR ACTIVIDAD
 let btnCrearActividad = document.querySelector('#butCrearActividad');
 btnCrearActividad.addEventListener('click', recojerFormActividad);
+
 let butModificaActividad = document.querySelector('#butModificaActividad');
 btnCrearActividad.addEventListener('click', modificarActividadLoad);
 

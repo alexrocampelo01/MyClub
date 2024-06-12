@@ -5,30 +5,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Listas</title>
-    <style>
-        span {
-          background-color: aqua;
-          width: 100%;
-        }
-        .esconder{
-            display: none;
-        }
-      </style>
+    <link rel="stylesheet" href="../Css/listas.css">
 </head>
 <body>
     <nav>
         <a href="index.html">INDEX</a>
         <a href="Listas.html">Listas</a>
         <a href="CalendarioEjemplo.html">Calendarios</a>
-      </nav>
+    </nav>
     <div id="divListas">
         <div id="Filtros">
-            <label for="roles">Selecciona Usarios a listar</label>
-            <select name="usuarios" id="usuarios">
+            <label for="tipeUser">Selecciona Usarios a listar</label>
+            <select name="tipeUser" id="tipeUser">
                 <option value="directores">directores</option>
                 <option value="usuarios">Usuarios</option>
                 <option value="monitores">Monitores</option>
                 <option value="socios">Socios</option>
+                <option value="familiares">Familiares</option>
             </select>
             <label for="curso" class="esconder">Selecciona Curso</label>
             <select name="usuarios" id="curso" class="esconder">
@@ -40,179 +33,34 @@
             </select>
             <span id="visualizarLista">Visualiza Lista</span>
         </div>
-        <div id="lista">
-
+        <div id="tableUsuarios">
+            <table>
+                <thead id="headerTableUsuarios">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Edad</th>
+                        <th>Curso</th>
+                        <th>Telefono</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyTablaUsuarios">
+                    <tr>
+                        <td>Nombre</td>
+                        <td>Apellidos</td>
+                        <td>Edad</td>
+                        <td>Curso</td>
+                        <td>Telefono</td>
+                        <td>Email</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-
     </div>
-<script>
-    let urlLocal = 'http://localhost/Myclub/Codigo/php/'
-    let divFiltros = document.querySelector('#divListas');
-    let selectUsuarios = document.querySelector('#usuarios');
-    selectUsuarios.addEventListener('change', cambiarFiltros);
-
-    function cambiarFiltros(){
-        let selectCurso = document.querySelector('#curso');
-        selectCurso.classList.add('esconder');
-        let url = ""
-        switch(selectUsuarios.value){
-            case "directores":
-                
-                url = urlLocal += `usuarios.php?lista=directores&club=niara`;
-            break;
-            case "usuarios":
-                
-            break;
-            case "monitores":
-            break;
-            case "socios":
-            break;
-        }
-        console.log("url ==", url)
-
-    }
-
-
-    let butVisualizar = document.querySelector('#visualizarLista');
-    butVisualizar.addEventListener('click', creatLista);
-
-    async function creatLista(){
-        let filtro = "";
-        let usario = selectUsuarios;
-        let curso = document.querySelector('#curso');
-        filtro += usario.value +","+ curso.value;
-        console.log('filtro', filtro);
-
-        let listaUsuarios =  await peticionDeListas(usario.value, curso.value);
-        console.log('lista de usarios = ',listaUsuarios)
-        s
-        
-        displayList(listaUsuarios, usario.value);
-
-
-        }
-
-    function displayList(data, tipo){
-        let divListado = document.querySelector('#lista');
-        divListado.innerHTML ="";
-
-        if(Array.isArray(data) && data){
-            data.forEach(element => {
-                console.log('datos lista = ',element)
-                let elementoLista = document.createElement('div');
-                let nombreSpan = document.createElement('span');
-                console.log('primera letra',tipo[0])
-                if(tipo == "usuarios"){
-                nombreSpan.textContent=`${element.nom_usu}`;
-                }else{
-                let nombre = `nom_${tipo[0]}`;
-                let apel1 = `apel1_${tipo[0]}`;
-                let apel2 = `apel2_${tipo[0]}`;
-
-                console.log(`${element[nombre]} ${element[apel1]} ${element[apel2]}`)
-
-                nombreSpan.textContent=`${element[nombre]} ${element[apel1]} ${element[apel2]}`;
-                }
-
-                elementoLista.append(nombreSpan);
-                divListado.append(elementoLista);
-            });
-
-        }
-    }
-    async function peticionDeListas(tipo, curso){
-        let url = `http://localhost/Myclub/Codigo/php/usuarios.php?lista=${tipo}`;
-        // switch(tipo){
-        //     case "directores":
-        //         url += "lista=directores";
-        //     break;
-        //     case "monitores":
-        //         url += "lista=monitores";
-        //     break;
-        // }
-        console.log(`${url}`);
-        let data = fetch(`${url}`, {
-            method:'GET',
-            headers: {
-                webToken: `${localStorage.getItem('jwt')}`,
-            },
-        })
-        .then(response => {
-            // console.log(response.status);
-            switch(response.status){
-                case 200:
-                    // console.log("que pasa",response);
-                    return response.json();
-                case 201:
-                console.log("201");
-                    document.querySelector('#errores').innerHTML=`cargadas activiades`;
-                    return response.json();
-                case 404:
-                    document.querySelector('#errores').innerHTML=`Sql excepcion`;
-                    break;
-                case 406:
-                    console.log("usario ya usado");
-                    document.querySelector('#errores').innerHTML=`usuario repetido`;
-                    break;
-                case 401:
-                    console.log("no tienes permiso");
-                    document.querySelector('#errores').innerHTML=`no tienes permiso`;
-                    break;
-                default:
-                    document.querySelector('#errores').innerHTML=`error intentelo mas tarde`;
-                    console.log("defecto");
-                    break;
-            }
-        })
-        .then((data) => {
-            console.log("data", data);
-            return data;
-        })
-        return data;
-    }
-    function getclubNombresDistint(){
-        let url = `http://localhost/Myclub/Codigo/php/usuarios.php?lista=clubNombres`;
-        let data = fetch(`${url}`, {
-            method:'GET',
-            headers: {
-                webToken: `${localStorage.getItem('jwt')}`,
-            },
-        })
-        .then(response => {
-            // console.log(response.status);
-            switch(response.status){
-                case 200:
-                    // console.log("que pasa",response);
-                    return response.json();
-                case 201:
-                console.log("201");
-                    document.querySelector('#errores').innerHTML=`cargadas activiades`;
-                    return response.json();
-                case 404:
-                    document.querySelector('#errores').innerHTML=`Sql excepcion`;
-                    break;
-                case 406:
-                    console.log("usario ya usado");
-                    document.querySelector('#errores').innerHTML=`usuario repetido`;
-                    break;
-                case 401:
-                    console.log("no tienes permiso");
-                    document.querySelector('#errores').innerHTML=`no tienes permiso`;
-                    break;
-                default:
-                    document.querySelector('#errores').innerHTML=`error intentelo mas tarde`;
-                    console.log("defecto");
-                    break;
-            }
-        })
-        .then((data) => {
-            console.log("data", data);
-            return data;
-        })
-        console.log("data", data);
-        return data;
-    }
-    
-</script>
+    <button id="crearUsuario">+</button>
 </body>
+<script src="../Js/permisos.js"></script>
+<script src="../Js/cargaDinamica.js"></script>
+<script src="../Js/listas.js"></script>
 </html>

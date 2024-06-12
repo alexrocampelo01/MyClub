@@ -1,32 +1,38 @@
 <?php
+// importamos la libreria que estamos usando
 require '../../vendor/autoload.php';
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-
+define('CLAVEJWT','X7pe{B1U3%q>');
+//obtenemos el webToken del header
 function obtenerJWT(){
     $headers = getallheaders();
-    $jwt = $headers['webToken'];
+    if(isset($headers['webToken'])){
+        $jwt = $headers['webToken'];
+    }else{
+        // lanzamos un error si no se encuentra
+        header("HTTP/1.1 401 Unauthorized");
+        echo "falta token";
+    }
     // echo $jwt;
     return $jwt;
 }
 
 //creador de webtoken 
 function generateWebToken ($userRol, $userName){
-    $claveJWT = 'X7pe{B1U3%q>';
     $playLoad = array(
         "userRol" => "$userRol",
         "userNom" => "$userName",
     );
-    $jwt = JWT::encode($playLoad, $claveJWT, 'HS256');
+    $jwt = JWT::encode($playLoad, CLAVEJWT, 'HS256');
     return $jwt;
 }
-
+// comprobar permisos del jwt obtenido en el header
 function comprobarPermisos(){
-    $claveJWT = 'X7pe{B1U3%q>';
     $jwt = obtenerJWT();
     try{
         //echo $jwt;
-        $usarios = JWT::decode($jwt, new Key($claveJWT, 'HS256'));
+        $usarios = JWT::decode($jwt, new Key(CLAVEJWT, 'HS256'));
         //echo $usarios;
         //print_r($usarios);
         return $usarios->userRol;

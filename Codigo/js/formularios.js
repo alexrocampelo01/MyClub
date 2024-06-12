@@ -1,11 +1,9 @@
 let urlLocal = 'http://localhost/Myclub/Codigo/php/'
 let webToken = "";
 // cargaDinamicaForms();
-let butLog = document.querySelector('#butLog');
-butLog.addEventListener('click', recojerFormularioLog);
-
 let butUser = document.querySelector('#butUser');
 butUser.addEventListener('click', recojerFormularioUsuario); 
+
 
 document.addEventListener('DOMContentLoaded', function() {
     var tipoUser = document.getElementById('tipo_user');
@@ -59,22 +57,99 @@ textoDebug.textContent= "hola angel";
 
 
 async function recojerFormularioUsuario(){
-        let datosU = {}
-        datosU.tipeRol = "usuario";
-        datosU.tipo_user = document.querySelector('#tipo_user').value;
-        datosU.nom_usu = document.querySelector('#nom_usu').value;
-        datosU.pass_usu = document.querySelector('#pass').value;
-        datosU.nom = document.querySelector('#nom').value;
-        datosU.apel1 = document.querySelector('#apel1').value;
-        datosU.apel2 = document.querySelector('#apel2').value;
-        datosU.tlf = document.querySelector('#tlf').value;
-        datosU.correo = document.querySelector('#correo').value;
+    let invalidsInputs =[];
+    let datosU = {}
+    datosU.tipeform = "usuario";
+    let tipo_user = document.querySelector('#tipo_user');
+    if(tipo_user.value == ""){
+        tipo_user.classList.add('campoInvalido');
+        invalidsInputs.push(tipo_user);
+    }else{
+        datosU.tipo_user = tipo_user.value;
+        tipo_user.classList.remove('campoInvalido');
+        invalidsInputs.filter(input => input != tipo_user); 
+    }
+    let nom_usu = document.querySelector('#nom_usu');
+    if(nom_usu.value == ""){
+        nom_usu.classList.add('campoInvalido');
+        invalidsInputs.push(nom_usu);
+    }else{
+        datosU.nom_usu = nom_usu.value;
+        nom_usu.classList.remove('campoInvalido');
+        invalidsInputs.filter(input => input != nom_usu); 
+    }
+
+    let pass_usu = document.querySelector('#pass');
+    if(pass_usu.value == ""){
+        pass_usu.classList.add('campoInvalido');
+        invalidsInputs.push(pass_usu);
+    }else{
+        datosU.pass_usu = pass_usu.value;
+        pass_usu.classList.remove('campoInvalido');
+        invalidsInputs.filter(input => input != pass_usu); 
+    }
+    let nom = document.querySelector('#nom');
+    if(nom.value == ""){
+        nom.classList.add('campoInvalido');
+        invalidsInputs.push(nom);
+    }else{
+        datosU.nom = nom.value;
+        nom.classList.remove('campoInvalido');
+        invalidsInputs.filter(input => input != nom); 
+    }
+
+    let apel1 = document.querySelector('#apel1');
+    if(apel1.value == ""){
+        apel1.classList.add('campoInvalido');
+        invalidsInputs.push(apel1);
+    }else{
+        datosU.apel1 = apel1.value;
+        apel1.classList.remove('campoInvalido');
+        invalidsInputs.filter(input => input != apel1); 
+    }
+    let apel2 = document.querySelector('#apel2');
+    if(apel2.value == ""){
+        apel2.classList.add('campoInvalido');
+        invalidsInputs.push(apel2);
+    }else{
+        datosU.apel2 = apel2.value;
+        apel2.classList.remove('campoInvalido');
+        invalidsInputs.filter(input => input != apel2);
+    }
+
+    let tlf = document.querySelector('#tlf');
+    if(typeof(tlf.value) != "number" && tlf.value == "" && tlf.value.length <= 9){
+
+        tlf.classList.add('campoInvalido');
+        invalidsInputs.push(tlf);
+    }else{
+        console.log("tlf",tlf.value);
+        datosU.tlf = tlf.value;
+        tlf.classList.remove('campoInvalido');
+        invalidsInputs.filter(input => input != tlf);
+    }
+    let correo = document.querySelector('#correo');
+    if(correo.value == ""){
+        correo.classList.add('campoInvalido');
+        invalidsInputs.push(correo);
+    }else{
+        datosU.correo = correo.value;
+        correo.classList.remove('campoInvalido');
+        invalidsInputs.filter(input => input != correo);
+    }
+    // comprueba si hay campos incorrectos
+    let datosRol =await recojerFormularioRol(tipo_user.value);
+    datosU.rol ={... datosRol};
+    console.log("datosRol",datosRol);
+    if(invalidsInputs.length == 0){
         lanzarForm(datosU);
+    }
 }
 async function lanzarForm(dataForm){ // arreglar
+    console.log("datosUsusario",dataForm)
     console.log("webToken", sessionStorage.getItem('jwt'));
-    console.log("lanzar form", dataForm.tipeRol);
-    fetch(`${urlLocal}usuarios.php`, {
+    console.log("lanzar form", dataForm.tipeform);
+    await fetch(`${urlLocal}usuarios.php`, {
         method:'POST',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -124,15 +199,31 @@ async function lanzarForm(dataForm){ // arreglar
         console.log("error",error);
     });
 }
-async function recojerFormularioRol(id,rol){ // arreglar
+async function recojerFormularioRol(rol){ // arreglar
+    let invalidsInputs =[];
     console.log("recojerFormularioRol");
     let datosAdicionales = {};
     datosAdicionales.tipeRol = rol;
-    datosAdicionales.id_u = id;
     switch(rol){
         case 'director':
-            datosAdicionales.club = document.querySelector('#club').value;
-            datosAdicionales.fecha_elec = document.querySelector('#fecha_elec').value;
+            let club = document.querySelector(' #club');
+            if(club.value == ""){
+                club.classList.add('campoInvalido');
+                invalidsInputs.push(club);
+            }else{
+                datosAdicionales.club = club.value;
+                club.classList.remove('campoInvalido');
+                invalidsInputs.filter(input => input != club);
+            }
+            let fecha_elec = document.querySelector('#fecha_elec');
+            if(fecha_elec.value == ""){
+                fecha_elec.classList.add('campoInvalido');
+                invalidsInputs.push(fecha_elec);
+            }else{
+                datosAdicionales.fecha_elec = fecha_elec.value;
+                fecha_elec.classList.remove('campoInvalido');
+                invalidsInputs.filter(input => input != fecha_elec);
+            }
             break;
         case 'monitor':
             datosAdicionales.id_d = document.querySelector('#director').value;
@@ -158,9 +249,9 @@ async function recojerFormularioRol(id,rol){ // arreglar
             console.log("no hay datos adicionales");
             break;
     }
-    console.log("datos adicionales",datosAdicionales);
-    console.log("webToken", sessionStorage.getItem('jwt'));
-    lanzarForm(datosAdicionales)
+    // console.log("datos adicionales",datosAdicionales);
+
+    return datosAdicionales;
 
 }
 function listaNombresDirectore(){
@@ -208,47 +299,31 @@ function listaNombresUsuario(){
         });
     });
 }
-function recojerFormularioLog(){
-    console.log("login");
-    let datosU = {};
-    datosU.tipeRol = "login";
-    datosU.nom_usu = document.querySelector('#nom_log').value;   
-    datosU.pass_usu = document.querySelector('#pass_log').value;
-    lanzarLogin(datosU);
+function mostrarContrasena() {
+    let inputContrasena = document.getElementById('pass_log');
+    if (inputContrasena.type === "password") {
+        inputContrasena.type = "text";
+    } else {
+        inputContrasena.type = "password";
+    }
 }
-async function lanzarLogin(dataForm){ //funciona 
-    fetch(`${urlLocal}usuarios.php`, {
-        method:'POST',
-        headers: {
-            'Content-Type': 'application/json;charset=utf-8',
-        },
-        body: JSON.stringify(dataForm),
-    })
-    .then(response => {
 
-            switch(response.status){
-                case 200:
-                    return response.json();
-                case 201:
-                    document.querySelector('#errores').innerHTML=`creado con exito`;
-                    return response.json();
-                case 404:
-                    document.querySelector('#errores').innerHTML=`Ese nombre de usario ya existe`;
-                    break;
-                case 406:
-                    document.querySelector('#errores').innerHTML=`algo incorrecto`;
-                    break;
-                default:
-                    document.querySelector('#errores').innerHTML=`error intentelo mas tarde`;
-                    console.log("defecto");
-                    break;
-            }
-        return response.json();
-    })
-    .then(data => {
-        // console.log(data);
-        let jwt = data.replace(/["']/g, '');
-        sessionStorage.setItem('jwt', jwt);
-        return data;
-    })
-}
+// validar();
+// function validar(){
+//     let feo = document.querySelector('#formulario');
+//     console.log(feo.childNodes);
+//     inputs = feo.querySelectorAll('input');
+//     console.log(inputs);
+//     inputs.forEach(input => {
+//         console.log(input);
+//         input.addEventListener('blur', function(){
+//             console.log(input);
+//             if(input.value == ""){
+//                 input.classList.add('campoInvalido');
+//             }else{
+//                 input.classList.remove('campoInvalido');
+//             }
+//         });
+//     });
+// }
+
