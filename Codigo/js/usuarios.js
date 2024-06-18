@@ -1,6 +1,4 @@
-let urlLocal = 'http://localhost/Myclub/Codigo/php/'
-let webToken = "";
-// cargaDinamicaForms();
+
 let butUser = document.querySelector('#butUser');
 butUser.addEventListener('click', recojerFormularioUsuario); 
 
@@ -47,17 +45,14 @@ function loadForm(tipoUser = ''){
             listaNombresDirectore();
         }else if(tipoUser == 'familiar'){
             console.log("familiar");
-            listaNombresUsuario();
+            listaNombresSocios();
         }
     });
 }
 
-let textoDebug = document.querySelector('#errores');
-textoDebug.textContent= "hola angel";
-
-
+let invalidsInputs =[];
 async function recojerFormularioUsuario(){
-    let invalidsInputs =[];
+    invalidsInputs =[];
     let datosU = {}
     datosU.tipeform = "usuario";
     let tipo_user = document.querySelector('#tipo_user');
@@ -119,7 +114,6 @@ async function recojerFormularioUsuario(){
 
     let tlf = document.querySelector('#tlf');
     if(typeof(tlf.value) != "number" && tlf.value == "" && tlf.value.length <= 9){
-
         tlf.classList.add('campoInvalido');
         invalidsInputs.push(tlf);
     }else{
@@ -138,16 +132,140 @@ async function recojerFormularioUsuario(){
         invalidsInputs.filter(input => input != correo);
     }
     // comprueba si hay campos incorrectos
-    let datosRol =await recojerFormularioRol(tipo_user.value);
-    datosU.rol ={... datosRol};
+    let datosRol = await recojerFormularioRol(tipo_user.value);
+    datosU.rol ={...datosRol};
     console.log("datosRol",datosRol);
+    console.log("Formulario recojido",datosU);
+    console.log("errores formulario",invalidsInputs);
     if(invalidsInputs.length == 0){
         lanzarForm(datosU);
+    }else{
+        let stringError = "";
+        invalidsInputs.forEach(input => {
+            input.classList.add('campoInvalido');
+            stringError += input.name + " , ";
+        })
+        document.querySelector('#errores').innerHTML=`Campo incorrecto ${stringError}`;
     }
 }
+async function recojerFormularioRol(rol){ // arreglar
+    console.log("recojerFormularioRol");
+    let datosAdicionales = {};
+    datosAdicionales.tipeRol = rol;
+    switch(rol){
+        case 'director':
+            let club = document.querySelector('#club');
+            if(club.value == ""){
+                club.classList.add('campoInvalido');
+                invalidsInputs.push(club);
+            }else{
+                datosAdicionales.club = club.value;
+                club.classList.remove('campoInvalido');
+                invalidsInputs.filter(input => input != club);
+            }
+            let fecha_elec = document.querySelector('#fecha_elec');
+            if(isFechaValida(fecha_elec.value) || fecha_elec.value == ""){
+                fecha_elec.classList.add('campoInvalido');
+                invalidsInputs.push(fecha_elec);
+            }else{
+                datosAdicionales.fecha_elec = fecha_elec.value;
+                fecha_elec.classList.remove('campoInvalido');
+                invalidsInputs.filter(input => input != fecha_elec);
+            }
+            console.log("fecha", fecha_elec.value);
+            break;
+        case 'monitor':
+            datosAdicionales.id_d = document.querySelector('#director').value;
+            datosAdicionales.curso_m = document.querySelector('#curso_m').value;
+            datosAdicionales.carne_conducir = document.querySelector('#carne_conducir').value;
+            datosAdicionales.titulo_monitor = document.querySelector('#titulo_monitor').value;
+            break;
+        case 'socio':
+            datosAdicionales.curso_s = document.querySelector('#curso').value;
+
+            let colegio = document.querySelector('#colegio');
+            if(colegio.value == ""){
+                colegio.classList.add('campoInvalido');
+                invalidsInputs.push(colegio);
+            }else{
+                datosAdicionales.colegio = colegio.value;
+                colegio.classList.remove('campoInvalido');
+                invalidsInputs.filter(input => input != colegio);
+            }
+            let fechNac = document.querySelector('#fechNac');
+            if(isFechaValida(fechNac.value) || fechNac.value == ""){
+                fechNac.classList.add('campoInvalido');
+                invalidsInputs.push(fechNac);
+            }else{
+                datosAdicionales.fechNac = fechNac.value;
+                fechNac.classList.remove('campoInvalido');
+                invalidsInputs.filter(input => input != fechNac);
+            }
+            let fecha_inscrip = document.querySelector('#fecha_inscrip');
+            if(isFechaValida(fecha_inscrip.value) || fecha_inscrip.value == ""){
+                fecha_inscrip.classList.add('campoInvalido');
+                invalidsInputs.push(fecha_inscrip);
+            }else{
+                datosAdicionales.fecha_inscrip = fecha_inscrip.value;
+                fecha_inscrip.classList.remove('campoInvalido');
+                invalidsInputs.filter(input => input != fecha_inscrip);
+            }
+            let observaciones = document.querySelector('#observaciones');
+            if(observaciones.value == ""){
+                observaciones.classList.add('campoInvalido');
+                invalidsInputs.push(observaciones);
+            }else{ 
+                datosAdicionales.observaciones = observaciones.value;
+                observaciones.classList.remove('campoInvalido');
+                invalidsInputs.filter(input => input != observaciones);
+            }
+            break;
+        case 'familiar':
+            datosAdicionales.id_s = document.querySelector('#socio').value;
+            let direccion = document.querySelector('#dir');
+            if(direccion.value == ""){
+                direccion.classList.add('campoInvalido');
+                invalidsInputs.push(direccion);
+            }else{
+                datosAdicionales.dir = direccion.value;
+                direccion.classList.remove('campoInvalido');
+                invalidsInputs.filter(input => input != direccion);
+            }
+            let loc = document.querySelector('#loc');
+            if(loc.value == ""){
+                loc.classList.add('campoInvalido');
+                invalidsInputs.push(loc);
+            }else{
+                datosAdicionales.loc = loc.value;
+                loc.classList.remove('campoInvalido');
+                invalidsInputs.filter(input => input != loc);
+            }
+            let cp = document.querySelector('#cp');
+            console.log("cp",cp);
+            console.log("cp valor",cp.value);
+            if(typeof(cp.value) != "number" && cp.value == "" && cp.value.length <= 5){
+                cp.classList.add('campoInvalido');
+                invalidsInputs.push(cp);
+            }else{
+                datosAdicionales.cp = cp.value;
+                cp.classList.remove('campoInvalido');
+                invalidsInputs.filter(input => input != cp);
+            }
+            datosAdicionales.parentesco = document.querySelector('#parentesco').value;
+            break;
+        default:
+            console.log("no hay datos adicionales");
+            break;
+    }
+    // console.log("datos adicionales",datosAdicionales);
+
+    return datosAdicionales;
+
+}
+
 async function lanzarForm(dataForm){ // arreglar
     console.log("datosUsusario",dataForm)
-    console.log("webToken", sessionStorage.getItem('jwt'));
+    // console.log("webToken", sessionStorage.getItem('jwt'));
     console.log("lanzar form", dataForm.tipeform);
     await fetch(`${urlLocal}usuarios.php`, {
         method:'POST',
@@ -188,72 +306,16 @@ async function lanzarForm(dataForm){ // arreglar
             if(dataForm.tipeRol == "usuario"){
                 idU =data;
                 console.log("usuario creado con exito");
-                recojerFormularioRol(idU, dataForm.tipo_user);
+                location.reload(true);
             }else{
                 console.log("crado otro tipo de usuario", dataForm.tipeRol);
             }
         }else{
             console.log("no hay datos");
         }
-    }).catch(error => {
-        console.log("error",error);
-    });
+    })
 }
-async function recojerFormularioRol(rol){ // arreglar
-    let invalidsInputs =[];
-    console.log("recojerFormularioRol");
-    let datosAdicionales = {};
-    datosAdicionales.tipeRol = rol;
-    switch(rol){
-        case 'director':
-            let club = document.querySelector(' #club');
-            if(club.value == ""){
-                club.classList.add('campoInvalido');
-                invalidsInputs.push(club);
-            }else{
-                datosAdicionales.club = club.value;
-                club.classList.remove('campoInvalido');
-                invalidsInputs.filter(input => input != club);
-            }
-            let fecha_elec = document.querySelector('#fecha_elec');
-            if(fecha_elec.value == ""){
-                fecha_elec.classList.add('campoInvalido');
-                invalidsInputs.push(fecha_elec);
-            }else{
-                datosAdicionales.fecha_elec = fecha_elec.value;
-                fecha_elec.classList.remove('campoInvalido');
-                invalidsInputs.filter(input => input != fecha_elec);
-            }
-            break;
-        case 'monitor':
-            datosAdicionales.id_d = document.querySelector('#director').value;
-            datosAdicionales.curso_m = document.querySelector('#curso_m').value;
-            datosAdicionales.carne_conducir = document.querySelector('#carne_conducir').value;
-            datosAdicionales.titulo_monitor = document.querySelector('#titulo_monitor').value;
-            break;
-        case 'socio':
-            datosAdicionales.curso = document.querySelector('#curso').value;
-            datosAdicionales.colegio = document.querySelector('#colegio').value;
-            datosAdicionales.fechNac = document.querySelector('#fechNac').value;
-            datosAdicionales.fecha_inscrip = document.querySelector('#fecha_inscrip').value;
-            datosAdicionales.observaciones = document.querySelector('#observaciones').value;
-            break;
-        case 'familiar':
-            datosAdicionales.id_s = document.querySelector('#socio').value;
-            datosAdicionales.dir = document.querySelector('#dir').value;
-            datosAdicionales.loc = document.querySelector('#loc').value;
-            datosAdicionales.cp = document.querySelector('#cp').value;
-            datosAdicionales.parentesco = document.querySelector('#parentesco').value;
-            break;
-        default:
-            console.log("no hay datos adicionales");
-            break;
-    }
-    // console.log("datos adicionales",datosAdicionales);
 
-    return datosAdicionales;
-
-}
 function listaNombresDirectore(){
     let selectorDirectores = document.querySelector('#director');
     console.log("selectorDirectores",selectorDirectores);
@@ -268,16 +330,15 @@ function listaNombresDirectore(){
         return response.json();
     }).then(data => {     
         console.log(data);
-        console.log
         data.forEach(element => {
             let option = document.createElement('option');
-            option.text = element.nom + element.apel1;
+            option.text = element.nom+" "+element.apel1+" "+element.apel2;
             option.value = element.id;
             selectorDirectores.appendChild(option);
         });
     });
 }
-function listaNombresUsuario(){
+function listaNombresSocios(){
     let selecSocio = document.querySelector('#socio');
     console.log("selecSocio",selecSocio);
     fetch(`${urlLocal}usuarios.php?lista=socios&nombres`, {
@@ -293,37 +354,14 @@ function listaNombresUsuario(){
         console.log(data);
         data.forEach(element => {
             let option = document.createElement('option');
-            option.text = element.nom + element.apel1;
+            option.text = element.nom+" "+element.apel1+" "+element.apel2;
             option.value = element.id;
             selecSocio.appendChild(option);
         });
     });
 }
-function mostrarContrasena() {
-    let inputContrasena = document.getElementById('pass_log');
-    if (inputContrasena.type === "password") {
-        inputContrasena.type = "text";
-    } else {
-        inputContrasena.type = "password";
-    }
-}
 
-// validar();
-// function validar(){
-//     let feo = document.querySelector('#formulario');
-//     console.log(feo.childNodes);
-//     inputs = feo.querySelectorAll('input');
-//     console.log(inputs);
-//     inputs.forEach(input => {
-//         console.log(input);
-//         input.addEventListener('blur', function(){
-//             console.log(input);
-//             if(input.value == ""){
-//                 input.classList.add('campoInvalido');
-//             }else{
-//                 input.classList.remove('campoInvalido');
-//             }
-//         });
-//     });
-// }
+function isFechaValida(d) {
+    return d instanceof Date && !isNaN(d);
+}
 

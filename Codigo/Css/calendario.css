@@ -1,78 +1,94 @@
 body{
   margin: 0;
+  /* background-color: rgba(0, 73, 28, 1); */
 }
 #contenido {
   width: 100%;
+  height: 100%;
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  margin-top: 10px;
-  background-color: magenta;
+  background-color: #4CAF50;
 }
 #divContenidoCalendario{
-  width: 49%;
+  width: 60%;
   height: 500px;
-  background-color: lightgreen;
+  background-color: #4CAF50;
   border: black solid 2px;
 }
 #infoCalendario{
   align-items: center;
   text-align: center;
-  background-color: lightblue;
-  height: 50px;
+  background-color: #4CAF50;
+  height: 30px;
   font-size: larger;
+  padding-top: 10px;
 }
 #restarMes{
-  background-color: chocolate;
+  background-color: #E2B122ff;
+  border-radius: 2vh;
+  padding: 5px;
   margin: 5px;
 }
+#mesCalendario{
+  
+}
 #sumarMes{
-  background-color: chocolate;
+  background-color: #E2B122ff;
+  border-radius: 2vh;
+  padding: 5px;
   margin: 5px;
 }
 #calendario{
   width: auto;
   height: 450px;
-  background-color: gold;
+  background-color: #E2B122ff;
   margin: 0;
   text-align: center;
 }
 #calendario table{
   height: 100%;
   width: 100%;
-  background-color: firebrick;
+  background-color: #E2B122ff;
   margin: 0;
 }
 #calendario tr{
   width: 100px;
-  background-color: blueviolet;
+  background-color: #4CAF50;
   margin: 0;
   flex: auto;
+  flex-direction: row;
+}
+#calendario td{
+  width: auto;
+  background-color: #4CAF50;
+  flex-direction: column;
+  align-items: center;
+}
+.textoCalendario{
+  display: flex;
+  justify-content: center;
+  align-items: center;
   flex-direction: column;
 }
 .spanActividad{
-  background-color: lightblue;
-  border-radius: 2vh;
-}
-#ListaActividades{
-  border: palegoldenrod;
+  background-color: #E2B122ff;
+  border-radius: 1vh;
 }
 .actividad{
   border: black;
 }
 
 #ListaActividades {
-  width: 49%;
+  width: 39%;
   height: 500px;
   border: black solid 2px;
-  background-color: lightcoral;
+  background-color: #4CAF50;
   overflow: auto;
 }
 .actividadLista{
-background: red;
-margin: 10px;
-flex: auto;
-
+  margin: 10px;
+  flex: auto;
 }
 .otrascosas{
   border: black solid 2px;
@@ -80,12 +96,47 @@ flex: auto;
   justify-content: space-between;
   flex-wrap: wrap;
 }
-
+.contenidoActividad{
+  border: solid 5px rgba(32, 117, 64, 1);
+  border-radius: 1vh;
+  color: white;
+}
 .actividad{
-  border: blue solid 2px;
   background-color: lightblue;
   margin: 5px;
   width: 90%;
+}
+.tituloActividad{
+  background-color: rgba(32, 117, 64, 1);
+  text-align: center;
+  border-radius: 1vh, 1vh, 0px, 0px;
+  width: 100%;
+}
+.contenidoActividad{
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  flex-direction: row;
+  background-color: rgba(32, 117, 64, 1);
+}
+.informacionActividad{
+  width: 75%;
+}
+.accionesActividad{
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(32, 117, 64, 1);
+  align-items: center;
+  vertical-align: middle;
+  padding-top: 5px;
+  
+}
+.contenidoActividad button{
+  background-color: #E2B122ff;
+  border-radius: 2vh;
+  margin: 2px;
+  padding: 2px;
+  border: none;
 }
 /* Estilos para la ventana modal */
 .modal {
@@ -103,8 +154,8 @@ flex: auto;
 /* Estilos para el contenido de la ventana modal */
 .modal-content {
   background-color:rgba(32, 117, 64, 1);
-  margin: 10% auto; /* 15% desde arriba y centrado */
-  padding: 20px;
+  margin: 5% auto; /* 15% desde arriba y centrado */
+  padding: 10px;
   border: 1px solid #888;
   width: 50%; /* El contenido de la ventana modal ocupa el 80% de la pantalla */
   align-items: center;
@@ -148,6 +199,9 @@ flex: auto;
   position: absolute;
   left: 10px;
   top: 10px;
+  color: aliceblue;
+  text-align: left;
+  font-size: large;
 }
 .ocultar{
   display: none;

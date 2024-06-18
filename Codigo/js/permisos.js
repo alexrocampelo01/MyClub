@@ -3,11 +3,10 @@ function checkRol(jwt){
   if(sessionStorage.getItem('jwt') == null){
     window.location.href = 'login.html';
   }else{
-    let navCabecera = document.getElementById("navCabecera");
-    navCabecera.classList.remove('esconder');
-    console.log("jwt: "+sessionStorage.getItem('jwt'));
+    // navCabecera.classList.remove('esconder');
+    // console.log("jwt: "+sessionStorage.getItem('jwt'));
   }
+  let navCabecera = document.getElementById("navCabecera");
+  console.log("navCabecera: "+navCabecera);
 }
-
-
 checkRol();

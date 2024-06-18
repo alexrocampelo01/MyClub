@@ -1,4 +1,4 @@
-let urlLocal = 'http://localhost/Myclub/Codigo/php/'
+
 let divFiltros = document.querySelector('#divListas');
 let divListas = document.querySelector('#divListas');
 
@@ -174,14 +174,29 @@ function changeList(){
     console.log ("lista",getListas());
     
 }
+
 let butCrearUsario = document.querySelector('#crearUsuario');
 butCrearUsario.addEventListener('click', crearUsuario);
 
-function crearUsuario(){
-console.log("crearUsuario");
+let spanCerrar = document.querySelector('#cerrarModal');
+console.log("spanCerrar",spanCerrar);
+spanCerrar.addEventListener('click', cerrarModal);
+
+function abrirModal(){
+    let modal = document.querySelector('#modalUsuario');
+    console.log("modal",modal);
+    modal.style.display = 'block';
+};
+function cerrarModal(){
+    let modal = document.querySelector('#modalUsuario');
+    console.log("modal",modal);
+    modal.style.display = 'none';
 }
-
-
-
+window.onclick = function(event) {
+    let modal = document.querySelector('#modalUsuario');
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
 
 

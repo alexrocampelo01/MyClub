@@ -7,12 +7,14 @@ define('CLAVEJWT','X7pe{B1U3%q>');
 //obtenemos el webToken del header
 function obtenerJWT(){
     $headers = getallheaders();
+    // print_r($headers['webToken']);
     if(isset($headers['webToken'])){
         $jwt = $headers['webToken'];
     }else{
         // lanzamos un error si no se encuentra
         header("HTTP/1.1 401 Unauthorized");
         echo "falta token";
+        exit;
     }
     // echo $jwt;
     return $jwt;

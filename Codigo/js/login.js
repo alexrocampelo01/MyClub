@@ -1,5 +1,3 @@
-let urlLocal = 'http://localhost/Myclub/Codigo/php/';
-
 let butLog = document.querySelector('#butLog');
 butLog.addEventListener('click', validarFormLorgin);
 

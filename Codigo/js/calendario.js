@@ -2,7 +2,6 @@ console.log("calendario.js");
 let elementDomListaActividades = document.querySelector('#ListaActividades');
 
 let listaActividades = [];
-let urlLocal = 'http://localhost/Myclub/Codigo/php/'
 
 listaNombreMonitores();
 
@@ -74,12 +73,14 @@ async function createCalendar(elem, year, month) {
 
   // <td> con el día  (1 - 31)
   while (d.getMonth() == mon) {
-    table += `<td class="dayWhitActivity" date-fecha='${convertirDateATextoSQL(d)}'> ${d.getDate()}`;
+    table += `<td class="diaConActividad" date-fecha='${convertirDateATextoSQL(d)}'>
+    <div class="textoCalendario">
+    <span class="numeroDia">${d.getDate()}</span>`;
     let actividadesHoy = await obtenerActividadesPorFecha(listaActividades, d);
     if(actividadesHoy.length > 0){
       table += `<span class="spanActividad">${actividadesHoy.length}</span>`;
     }
-    table += `</td>`;
+    table += `</div></td>`;
     
     if (getDay(d) % 7 == 6) { // domingo, último dia de la semana nueva línea
       table += '</tr><tr>';
@@ -130,14 +131,17 @@ function seleccionarDia(e){
       divActividadLista.setAttribute('class', 'actividadLista');
       divActividadLista.setAttribute('id_C', `${actividad.id}`);
       divActividadLista.innerHTML = `    
-      <span>${actividad.titulo}</span>
-      <div>
-          <span>Curso: ${actividad.curso_ac}</span><br>
-          <span>Fecha: ${actividad.fechaHora_start} - ${actividad.fechaHora_end}</span>
-      </div>
-      <div>
-          <button idC="${actividad.id}" class="modificarAc">Modificar</button>
-          <button idC="${actividad.id}" class="eliminarAc">Eliminar</button>
+      <div class="contenidoActividad">
+      <span class="tituloActividad">${actividad.titulo}</span>
+        <div class="informacionActividad">
+            <span>Curso: ${actividad.curso_ac}</span><br>
+            <span>Fecha Inicio: ${actividad.fechaHora_start}</span><br>
+            <span>Fecha Final: ${actividad.fechaHora_end}</span>
+        </div>
+        <div class="accionesActividad">
+            <button idC="${actividad.id}" class="modificarAc">Modificar</button>
+            <button idC="${actividad.id}" class="eliminarAc">Eliminar</button>
+        </div>
       </div>
       `;
       // console.log(`creando lista`, divActividadLista);
@@ -148,15 +152,13 @@ function seleccionarDia(e){
     })
   }
 }
-function modificarActividadLoad2(e){
-  console.log("modificar actividad", e.target.getAttribute('idc'));
-}
 function modificarActividadLoad(e){
   console.log("modificar actividad", e.target.getAttribute('idc'));
-  activiadad = listaActividades.find(actividad => actividad.id == e.target.getAttribute('idc'));
+  let activiadad = listaActividades.find(actividad => actividad.id == e.target.getAttribute('idc'));
+
   // console.log("actividad", activiadad);
   // abromos el modal y lo modificamos
-  modal.style.display = "block";
+  abrirModal();
   document.querySelector('#butCrearActividad').classList.add('ocultar');
   document.querySelector('#butModificaActividad').classList.remove('ocultar');
   //rellenamos los campos
@@ -179,7 +181,7 @@ function modificarActividadLoad(e){
   document.querySelector('#butModificaActividad').setAttribute('id_C', `${activiadad.id}`);
   document.querySelector('#butModificaActividad').addEventListener('click', modificarActividad);
 }
-function modificarActividad(e){
+function modificarActividad(e){ // validar formulario
   console.log("modificar actividad");
   let activiadad ={};
   activiadad.id = e.target.getAttribute('id_C');
@@ -221,18 +223,27 @@ function modificarActividad(e){
       }
   }).then(data => {     
       console.log(data);
+      cerrarModal();
   });
 }
 function eliminarActividad(e){
   console.log("eliminar actividad", e.target.getAttribute('idc'));
-  fetch(`${urlLocal}actividades.php`, {
-      method:'DELETE',
-      headers: {
-          'Content-Type': 'application/json;charset=utf-8',
-          'webToken' : sessionStorage.getItem('jwt'),
-      },
-      body: JSON.stringify({id: e.target.getAttribute('idc')})
-});
+  let id_actividad = e.target.getAttribute('idc');
+  let confirmacion = confirm("¿Estas seguro de eliminar la actividad?");
+  if(confirmacion){
+  console.log("eliminar actividad");   
+  fetch(`${urlLocal}actividades.php?id=${id_actividad}`, {
+    method:'DELETE',
+    headers: {
+      'Content-Type': 'application/json;charset=utf-8',
+      'webToken' : sessionStorage.getItem('jwt'),
+    },
+  });
+  location.reload(); 
+  }else{
+    console.log("no se elimina");
+  }
+
 }
 
 
@@ -382,28 +393,33 @@ function crearActividad(dataActividad){
         }
     }).then(data => {     
         console.log(data);
+        cerrarModal();
     });
 }
 
 // Crear la ventana  modal
-var modal = document.getElementById("miModal");
-// Obtiene el botón que abre la ventana modal
-var btnModal = document.getElementById("abrirModal");
-// Cuando el usuario hace clic en el botón, abre la ventana modal 
-btnModal.addEventListener('click', abrirModal);
-function abrirModal() {
-  modal.style.display = "block";
-  // Obtiene el elemento que cierra la ventana modal
-  var span = document.getElementById("cerrarModal");
-  span.addEventListener('click', cerrarModal);
+let butCrear = document.querySelector('#butCrear');
+console.log("modal",butCrear);
+butCrear.addEventListener('click', abrirModal);
+
+let spanCerrar = document.querySelector('#cerrarModal');
+console.log("spanCerrar",spanCerrar);
+spanCerrar.addEventListener('click', cerrarModal);
+
+function abrirModal(){
+  console.log("abrir modal");
+  let modal = document.querySelector('#miModal');
+  console.log("modal",modal);
+  modal.style.display = 'block';
+};
+function cerrarModal(){
+  let modal = document.querySelector('#miModal');
+  console.log("modal",modal);
+  modal.style.display = 'none';
 }
-// Cuando el usuario hace clic en el elemento (x), cierra la ventana modal
-function cerrarModal() {
-  modal.style.display = "none";
-}
-// Cuando el usuario hace clic en cualquier lugar fuera de la ventana modal, la cierra
 window.onclick = function(event) {
+  let modal = document.querySelector('#miModal');
   if (event.target == modal) {
-    modal.style.display = "none";
+      modal.style.display = "none";
   }
 }

@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 echo" \n formulario no registrado";
             }
         }else{
-            echo "no tiene tipo de usario";
+            echo "informacion incorrecta";
             header("HTTP/1.1 406 Not Acceptable");
         }
     }
@@ -181,6 +181,7 @@ function crearUsuario($datos){
             $result = $con->query($sql);
             // lazamos un error
             if($result->num_rows != 0 ){
+                // echo "ususario usado";
                 header("HTTP/1.1 406 Not Acceptable");
             }else{ // creamos el usario
                 $nom = $datos->nom;
@@ -189,25 +190,26 @@ function crearUsuario($datos){
                 $correo = $datos->correo;
                 $tlf = $datos->tlf;
                 $tipo_user = $datos->tipo_user;
-                $rol = $datos->rol;
                 $sql = "INSERT INTO `usuarios` (`id`, `nom_usu`, `pass`, `nom`, `apel1`, `apel2`, `correo`, `tlf`, `tipo_user`) VALUES
                 (NULL, '$nomUsu', '$hashPass', '$nom', '$apel1', '$apel2', '$correo', '$tlf', '$tipo_user')";
                 // echo $sql;
                 $con->query($sql);
-                header("HTTP/1.1 201 Created");
                 $idUsu = $con->insert_id;
-                print_r($rol);
+                header("HTTP/1.1 201 Created");
+
+                $rol = $datos->rol;
+                $rol->id_u = $idUsu;
                 if($rol->tipeRol == "socio"){
-                    crearSocio($datos);
+                    crearSocio($rol);
                     // echo" \n crear socio";
                 }else if ($rol->tipeRol == "monitor"){
-                    crearMonitor($datos);
+                    crearMonitor($rol);
                     //  echo" \n crear monitor";
                 }else if ($rol->tipeRol == "director"){
-                    crearDirector($datos);
+                    crearDirector($rol);
                     // echo" \n crear director";
                 }else if ($rol->tipeRol == "familiar"){
-                    crearFamiliar($datos);
+                    crearFamiliar($rol);
                     // echo" \n crear director";
                 }              
             } 
@@ -227,6 +229,7 @@ function crearDirector($datos){
         try{
             $id_u = $datos -> id_u;
             // lazamos un error
+            // print_r($datos);
             if(checkIdUserExsits($id_u)){ 
                 $club = $datos -> club;
                 $fecha_elec = $datos -> fecha_elec;
@@ -290,12 +293,11 @@ function crearSocio($datos){
             if(checkIdUserExsits($id_u)){
                 $curso_s = $datos->curso_s;
                 $colegio = $datos->colegio;
-                $observacines = $datos->observacines;
+                $observaciones = $datos->observaciones;
                 $fechNac = $datos->fechNac;
                 $fecha_inscrip = $datos->fecha_inscrip;
-                $familiares = $datos->familiares;
                 $sql = "INSERT INTO `socios` (`id`, `id_u`, `curso`, `colegio`, `observaciones`, `fechaNacimiento`, `fechaInscrip`) VALUES
-                (NULL, '$id_u', '$curso_s', '$colegio', '$observacines', '$fechNac', '$fecha_inscrip');";
+                (NULL, '$id_u', '$curso_s', '$colegio', '$observaciones', '$fechNac', '$fecha_inscrip');";
 
                 $con->query($sql);
                 header("HTTP/1.1 201 Created");
@@ -396,7 +398,7 @@ function listaDirectores($id_d = 0){
     }
     if(isset($_GET['nombre'])){
         // echo "nombres";
-        $sql = "SELECT director.id, nom, apel1 FROM `director`INNER JOIN usuarios on director.id_u = usuarios.id WHERE 1; ";
+        $sql = "SELECT director.id, nom, apel1, apel2 FROM `director`INNER JOIN usuarios on director.id_u = usuarios.id WHERE 1; ";
     }
     // echo "director";
     if(checkDirector()){
@@ -435,19 +437,17 @@ function listaclubUnicos(){
 function listaSocios($id_s = 0){
     $con = new Conexion();
     if(checkDirector() || checkMonitor()){
-        if(isset($_GET['nombres'])){
-            // echo "nombre";
-            listaSociosNombres();
+        if(isset($_GET['id_s'])){
+            $id_s = $_GET['id_s'];
+            $sql = "SELECT * FROM `socios` WHERE 1 AND id = $id_s";
+        }else if(isset($_GET['nombres'])){
+           $sql = "SELECT socios.id, usuarios.nom, usuarios.apel1, usuarios.apel2 FROM `socios` INNER JOIN usuarios ON socios.id_u = usuarios.id WHERE 1; ";
         }
         else{
-            if(isset($_GET['id_s'])){
-                $id_s = $_GET['id_s'];
-                $sql = "SELECT * FROM `socios` WHERE 1 AND id = $id_s";
-            }else{
-                $sql = "SELECT * FROM `socios` INNER JOIN `usuarios` ON socios.id_u = usuarios.id WHERE 1;";
-            }
+            $sql = "SELECT * FROM `socios` INNER JOIN `usuarios` ON socios.id_u = usuarios.id WHERE 1;";
         }
         try{
+            // echo $sql;
             $result = $con->query($sql);
             $socios = $result->fetch_all(MYSQLI_ASSOC);
             echo json_encode($socios);
@@ -459,7 +459,7 @@ function listaSocios($id_s = 0){
 }
 function listaSociosNombres(){
     $con = new Conexion();
-    $sql = "SELECT socios.id, usuarios.nom, usuarios.apel1 FROM `socios` INNER JOIN usuarios ON socios.id_u = usuarios.id WHERE 1; ";
+    
     if(checkDirector() || checkMonitor()){
         try{
             $result = $con->query($sql);
@@ -578,7 +578,6 @@ function modificarUsuario($datos){
         echo "otro usarios $datos->tipo_user";
     }
 }
-
 
 function modificarDirector($datos){
     $con = new Conexion();
