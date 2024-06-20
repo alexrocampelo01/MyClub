@@ -195,8 +195,7 @@ function modificarActividad(e){ // validar formulario
   activiadad.descripcion = document.querySelector('#descripcion').value;  
   activiadad.material = document.querySelector('#material').value;
   console.log("actividad", activiadad);
-  // fetch(`${urlLocal}actividades.php`, {
-  fetch(`${urlServidor}actividades.php`, {
+  fetch(`${urlLocal}actividades.php`, {
       method:'PUT',
       headers: {
           'Content-Type': 'application/json;charset=utf-8',
@@ -233,8 +232,7 @@ function eliminarActividad(e){
   let confirmacion = confirm("¿Estas seguro de eliminar la actividad?");
   if(confirmacion){
   console.log("eliminar actividad");   
-  // fetch(`${urlLocal}actividades.php?id=${id_actividad}`, {
-  fetch(`${urlServidor}actividades.php?id=${id_actividad}`, {
+  fetch(`${urlLocal}actividades.php?id=${id_actividad}`, {
     method:'DELETE',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
@@ -267,8 +265,7 @@ function convertirDateATextoSQL(fecha) {
 
 async function getActividadesList(startDate, endDate){
   // console.log(`[URL] ${urlLocal}actividades.php?lista=rangoFechas&filtro=${startDate},${endDate}`)
-  // let listaActividades = fetch(`${urlLocal}actividades.php?lista=rangoFechas&filtro=${startDate},${endDate}`, {
-  let listaActividades = fetch(`${urlServidor}actividades.php?lista=rangoFechas&filtro=${startDate},${endDate}`, {
+  let listaActividades = fetch(`${urlLocal}actividades.php?lista=rangoFechas&filtro=${startDate},${endDate}`, {
       method:'GET',
       headers: {
         webToken: `${sessionStorage.getItem('jwt')}`,
@@ -321,8 +318,7 @@ function obtenerActividadesPorFecha(listaActividades, fecha) {
 
 function listaNombreMonitores(){
     let selecMonitores = document.querySelector('#monitor');
-    // fetch(`${urlLocal}usuarios.php?lista=monitores&nombres`, {
-    fetch(`${urlServidor}usuarios.php?lista=monitores&nombres`, {
+    fetch(`${urlLocal}usuarios.php?lista=monitores&nombres`, {
         method:'GET',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -369,8 +365,7 @@ function recojerFormActividad(){
 function crearActividad(dataActividad){
     console.log("crear actividad", dataActividad);
     console.log("crear actividad JSON", JSON.stringify(dataActividad));
-    // fetch(`${urlLocal}actividades.php`, {
-    fetch(`${urlServidor}actividades.php`, {
+    fetch(`${urlLocal}actividades.php`, {
         method:'POST',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',

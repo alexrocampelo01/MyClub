@@ -281,8 +281,7 @@ async function lanzarForm(dataForm){ // arreglar
     console.log("datosUsusario",dataForm)
     // console.log("webToken", sessionStorage.getItem('jwt'));
     console.log("lanzar form", dataForm.tipeform);
-    // await fetch(`${urlLocal}usuarios.php`, {
-    await fetch(`${urlServidor}usuarios.php`, {
+    await fetch(`${urlLocal}usuarios.php`, {
         method:'POST',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -391,8 +390,7 @@ function modificarUsuario(data){
 function listaNombresDirectore(){
     let selectorDirectores = document.querySelector('#director');
     console.log("selectorDirectores",selectorDirectores);
-    // fetch(`${urlLocal}usuarios.php?lista=directores&nombre`, {
-    fetch(`${urlServidor}usuarios.php?lista=directores&nombre`, {
+    fetch(`${urlLocal}usuarios.php?lista=directores&nombre`, {
         method:'GET',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -415,8 +413,7 @@ function listaNombresDirectore(){
 function listaNombresSocios(){
     let selecSocio = document.querySelector('#socio');
     console.log("selecSocio",selecSocio);
-    // fetch(`${urlLocal}usuarios.php?lista=socios&nombres`, {
-    fetch(`${urlServidor}usuarios.php?lista=socios&nombres`, {
+    fetch(`${urlLocal}usuarios.php?lista=socios&nombres`, {
         method:'GET',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',

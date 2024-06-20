@@ -55,8 +55,7 @@ function cargarLista(e){
     }
 };
 function getUsuarios(){
-    // fetch(`${urlLocal}usuarios.php?lista=usuarios`, {
-    fetch(`${urlServidor}usuarios.php?lista=usuarios`, {
+    fetch(`${urlLocal}usuarios.php?lista=usuarios`, {
         method:'GET',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -87,8 +86,7 @@ function getUsuarios(){
 }
 
 function getDirectores(){
-    // fetch(`${urlLocal}usuarios.php?lista=directores`, {
-    fetch(`${urlServidor}usuarios.php?lista=directores`, {
+    fetch(`${urlLocal}usuarios.php?lista=directores`, {
         method:'GET',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -118,8 +116,7 @@ function getDirectores(){
 }
 
 function getMonitores(){
-    // fetch(`${urlLocal}usuarios.php?lista=monitores`, {
-    fetch(`${urlServidor}usuarios.php?lista=monitores`, {
+    fetch(`${urlLocal}usuarios.php?lista=monitores`, {
         method:'GET',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -150,8 +147,7 @@ function getMonitores(){
 }
 
 function getSocios(){
-    // fetch(`${urlLocal}usuarios.php?lista=socios`, {
-    fetch(`${urlServidor}usuarios.php?lista=socios`, {
+    fetch(`${urlLocal}usuarios.php?lista=socios`, {
         method:'GET',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -184,8 +180,7 @@ function getSocios(){
 }
 
 function getFamiliares(){
-    // fetch(`${urlLocal}usuarios.php?lista=familiares`, {
-    fetch(`${urlServidor}usuarios.php?lista=familiares`, {
+    fetch(`${urlLocal}usuarios.php?lista=familiares`, {
         method:'GET',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -241,11 +236,8 @@ async function recogerDatos(rol, id){
     let datos = {};
     console.log("rol", rol);
     console.log("id", id);
-    // console.log(`${urlLocal}usuarios.php?lista=${rol}&id=${id}`);
-    console.log(`${urlServidor}usuarios.php?lista=${rol}&id=${id}`);
-
-    // fetch(`${urlLocal}usuarios.php?lista=${rol}&id=${id}`, {
-    fetch(`${urlServidor}usuarios.php?lista=${rol}&id=${id}`, {
+    console.log(`${urlLocal}usuarios.php?lista=${rol}&id=${id}`);
+    fetch(`${urlLocal}usuarios.php?lista=${rol}&id=${id}`, {
         method:'GET',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',

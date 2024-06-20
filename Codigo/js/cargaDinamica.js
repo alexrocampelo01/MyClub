@@ -1,5 +1,5 @@
 let urlLocal = 'http://localhost/Myclub/Codigo/php/';
-let urlServidor = 'http://79.109.50.179/Codigo/php/';
+// let urlServidor = 'http://79.109.50.179/Codigo/php/';
 let divCabecera = document.getElementById("cabecera");
 let urlCabecera = "../html/header.html";
 fetch(urlCabecera)    
