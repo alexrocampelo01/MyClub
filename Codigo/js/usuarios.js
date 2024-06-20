@@ -1,6 +1,8 @@
 
-let butUser = document.querySelector('#butUser');
-butUser.addEventListener('click', recojerFormularioUsuario); 
+let butCrearUser = document.querySelector('#butCrearUser');
+butCrearUser.addEventListener('click', recojerFormularioUsuario); 
+let butModificarUser = document.querySelector('#butModificarUser');
+butModificarUser.addEventListener('click', recojerFormularioUsuarioModificar); // cambiar a modificarUsuario 
 
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -49,9 +51,12 @@ function loadForm(tipoUser = ''){
         }
     });
 }
+function recojerFormularioUsuarioModificar(){
+    recojerFormularioUsuario("modificar");
+}
 
 let invalidsInputs =[];
-async function recojerFormularioUsuario(){
+async function recojerFormularioUsuario(mode){
     invalidsInputs =[];
     let datosU = {}
     datosU.tipeform = "usuario";
@@ -137,8 +142,16 @@ async function recojerFormularioUsuario(){
     console.log("datosRol",datosRol);
     console.log("Formulario recojido",datosU);
     console.log("errores formulario",invalidsInputs);
+    //buscamos los elemetos ocultos y los quitamos
+    let campos ocultos = invalidsInputs.filter(input => input.classList.contains('esconderNone'))
     if(invalidsInputs.length == 0){
-        lanzarForm(datosU);
+        if(mode == "modificar"){
+            // datosU.id = idU;
+            console.log("modificar usuario",datosU);
+        }else{
+            console.log("crear usuario",datosU);
+            lanzarForm(datosU);
+        }
     }else{
         let stringError = "";
         invalidsInputs.forEach(input => {
@@ -148,6 +161,7 @@ async function recojerFormularioUsuario(){
         document.querySelector('#errores').innerHTML=`Campo incorrecto ${stringError}`;
     }
 }
+
 async function recojerFormularioRol(rol){ // arreglar
     console.log("recojerFormularioRol");
     let datosAdicionales = {};
@@ -267,7 +281,8 @@ async function lanzarForm(dataForm){ // arreglar
     console.log("datosUsusario",dataForm)
     // console.log("webToken", sessionStorage.getItem('jwt'));
     console.log("lanzar form", dataForm.tipeform);
-    await fetch(`${urlLocal}usuarios.php`, {
+    // await fetch(`${urlLocal}usuarios.php`, {
+    await fetch(`${urlServidor}usuarios.php`, {
         method:'POST',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -316,10 +331,68 @@ async function lanzarForm(dataForm){ // arreglar
     })
 }
 
+
+/*
+*MODIFICAR USUARIOS
+*/
+function modificarUsuario(data){
+    let infoUsuario = data[0];
+    console.log("data MODIFICAR",infoUsuario);
+    console.log("CARGO EL FORMULARIO", infoUsuario.tipo_user);
+    //Configuramos el formulario
+    document.querySelector('#tipo_user').value = infoUsuario.tipo_user;
+    this.loadForm(infoUsuario.tipo_user);
+    let label = document.querySelector("label[for='pass']").classList.add('esconderNone');
+    document.querySelector('#pass').classList.add('esconderNone');
+    butCrearUser.classList.add('esconderNone');
+    butModificarUser.classList.remove('esconderNone');
+    //Rellenamos el formulario
+    document.querySelector('#nom_usu').value = infoUsuario.nom_usu;
+    document.querySelector('#nom').value = infoUsuario.nom;
+    document.querySelector('#apel1').value = infoUsuario.apel1;
+    document.querySelector('#apel2').value = infoUsuario.apel2;
+    document.querySelector('#tlf').value = infoUsuario.tlf;
+    document.querySelector('#correo').value = infoUsuario.correo;
+    //Rellenamos el formulario de rol
+    // datosAdicionales.id_d = document.querySelector('#director').value;
+    // datosAdicionales.curso_m = document.querySelector('#curso_m').value;
+    // datosAdicionales.carne_conducir = document.querySelector('#carne_conducir').value;
+    // datosAdicionales.titulo_monitor = document.querySelector('#titulo_monitor').value;
+    console.log("director DEFAULT",document.querySelector('#director').value);
+    console.log("director cargado",infoUsuario.id_d);
+    let selectorDirectores = document.querySelector('#director')
+    for (let i = 0; i < selectorDirectores.options.length; i++) {
+        if (selectorDirectores.options[i].value === infoUsuario.id_d) {
+            opcionEncontrada = true;
+            selectorDirectores.options[i].selected = true;
+            console.log("opcion encontrado", selectorDirectores.options[i]);
+            console.log("opcion encontrada", infoUsuario.id_d);
+            break;
+        }
+    }
+
+    console.log("director DEFAULT",document.querySelector('#director').value);
+    console.log("director cargado",infoUsuario.id_d);
+    // let selectorDirectores = document.document.querySelector('#director')
+    // for (let i = 0; i < select.options.length; i++) {
+    //     if (select.options[i].value === infoUsuario.id_d) {
+    //         opcionEncontrada = true;
+    //         console.log("opcion encontrada", infoUsuario.id_d);
+    //         break;
+    //     }
+    // }
+    document.querySelector('#curso_m').value = infoUsuario.curso;
+    
+}
+
+/*
+*Funciones de apoyo
+*/
 function listaNombresDirectore(){
     let selectorDirectores = document.querySelector('#director');
     console.log("selectorDirectores",selectorDirectores);
-    fetch(`${urlLocal}usuarios.php?lista=directores&nombre`, {
+    // fetch(`${urlLocal}usuarios.php?lista=directores&nombre`, {
+    fetch(`${urlServidor}usuarios.php?lista=directores&nombre`, {
         method:'GET',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -338,10 +411,12 @@ function listaNombresDirectore(){
         });
     });
 }
+
 function listaNombresSocios(){
     let selecSocio = document.querySelector('#socio');
     console.log("selecSocio",selecSocio);
-    fetch(`${urlLocal}usuarios.php?lista=socios&nombres`, {
+    // fetch(`${urlLocal}usuarios.php?lista=socios&nombres`, {
+    fetch(`${urlServidor}usuarios.php?lista=socios&nombres`, {
         method:'GET',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',

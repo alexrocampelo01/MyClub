@@ -16,7 +16,7 @@ header {
 nav{
     width: auto;
     grid-column: 2;
-    background-color: aqua;
+    background-color: rgba(0, 73, 28, 1);
 }
 nav ul {
     display: flex;
@@ -29,8 +29,30 @@ nav li {
     height: auto;
     margin: auto;
     border-radius: 5px;
-    background-color:  rgba(189, 166, 40, 1);
+    color: rgba(189, 166, 40, 1);
+    text-decoration: none;
+    list-style: none;
 }
+a:link {
+    color: white;
+    text-decoration: none;
+  }
+  
+  /* Estilo para enlaces visitados */
+  a:visited {
+    color: white;
+  }
+  
+  /* Estilo para enlaces cuando el mouse pasa sobre ellos */
+  a:hover {
+    color: white;
+    text-decoration: underline;
+  }
+  
+  /* Estilo para enlaces cuando se hacen clic en ellos */
+  a:active {
+    color: white;
+  }
 
 .title h1 {
     font-size: 1.5em;
@@ -46,6 +68,9 @@ nav li {
 }
 .esconder{
     visibility: hidden;
+}
+.esconderNone{
+    display: none;
 }
 /*
 $goldenrod: #E2B122ff;

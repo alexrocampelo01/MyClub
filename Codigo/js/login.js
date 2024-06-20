@@ -47,7 +47,8 @@ function recojerFormularioLog(){
     lanzarLogin(datosU);
 }
 async function lanzarLogin(dataForm){ //funciona 
-    fetch(`${urlLocal}usuarios.php`, {
+    // fetch(`${urlLocal}usuarios.php`, {
+    fetch(`${urlServidor}usuarios.php`, {
         method:'POST',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -80,7 +81,9 @@ async function lanzarLogin(dataForm){ //funciona
         let jwt = data.replace(/["']/g, '');
         sessionStorage.setItem('jwt', jwt);
         document.querySelector('#errores').innerHTML=' logeado con exito';
+        //configuaraciones por haber logeado
         window.location.href = "http://localhost/Myclub/Codigo/html/CalendarioEjemplo.html";
+        document.querySelector('#errores').innerHTML=' logeado con exito';
         return data;
     })
 }

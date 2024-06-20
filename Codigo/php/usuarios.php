@@ -382,23 +382,23 @@ function listaUsuarios($id_u = 0){
         echo "otro usarios $datos->tipo_user";
     }
 }
-function listaDirectores($id_d = 0){
+function listaDirectores(){
+    // echo "LISTA DIRECTOR \n";
     $con = new Conexion();
-    $sql =  $sql = "SELECT * FROM `director` INNER JOIN `usuarios` ON director.id_u = usuarios.id WHERE 1;";
     // print_r($_GET);
     if(isset($_GET['club'])){
         echo "club";
         $club = $_GET['club'];
         $sql = "SELECT * FROM director WHERE club LIKE '%$club%'; ";
-    }
-    if(isset($_GET['id_d'])){
-        echo "id_d";
-        $id_d = $_GET['id_d'];
-        $sql = "SELECT * FROM `director` WHERE 1 AND id = $id_d";
-    }
-    if(isset($_GET['nombre'])){
+    }else if(isset($_GET['id'])){
+        // echo "ID \n ";
+        $id_d = $_GET['id'];
+        $sql = "SELECT * FROM `director` INNER JOIN usuarios ON director.id_u = usuarios.id WHERE 1 AND director.id = $id_d";
+    }else if(isset($_GET['nombre'])){
         // echo "nombres";
         $sql = "SELECT director.id, nom, apel1, apel2 FROM `director`INNER JOIN usuarios on director.id_u = usuarios.id WHERE 1; ";
+    }else{
+        $sql = $sql = "SELECT * FROM `director` INNER JOIN `usuarios` ON director.id_u = usuarios.id WHERE 1;";
     }
     // echo "director";
     if(checkDirector()){
@@ -414,6 +414,39 @@ function listaDirectores($id_d = 0){
     }else {
         header("HTTP/1.1 401 Unauthorized");
         echo "otro usarios $datos->tipo_user";
+    }
+}
+function listaMonitores(){
+    $con = new Conexion();
+    // print_r($_GET);
+    if(isset($_GET['id'])){
+        $id_m = $_GET['id'];
+        $sql = "SELECT * FROM `monitores` INNER JOIN usuarios ON monitores.id_u = usuarios.id WHERE 1 AND monitores.id = $id_m;";
+    }else if(isset($_GET['curso'])){
+        $curso = $_GET['curso'];
+        $sql = "SELECT * FROM `monitor` WHERE 1 and curso_m like '$curso'";
+    }else if(isset($_GET['nombres'])){
+        $sql = "SELECT monitores.id, usuarios.nom, usuarios.apel1 FROM `monitores` INNER JOIN usuarios ON monitores.id_u = usuarios.id WHERE 1; ";
+    }
+    else{
+        $sql = "SELECT monitores.id AS id_m, usuarios.id AS id_usuarios, monitores.*, usuarios.* 
+        FROM `monitores` INNER JOIN `usuarios` ON usuarios.id = monitores.id_u 
+        WHERE 1";
+    }
+    if(checkDirector() || checkMonitor()){
+
+        try{
+            // echo $sql;
+            $result = $con->query($sql);
+            // print_r($result);
+            $monitores = $result->fetch_all(MYSQLI_ASSOC);
+            echo json_encode($monitores);
+        }catch (mysqli_sql_exception $e) {
+            $e;
+            header("HTTP/1.1 406 Not Acceptable");
+        }
+    }else{
+        header("HTTP/1.1 401 Unauthorized");
     }
 }
 function listaclubUnicos(){
@@ -457,51 +490,7 @@ function listaSocios($id_s = 0){
         }
     }
 }
-function listaSociosNombres(){
-    $con = new Conexion();
-    
-    if(checkDirector() || checkMonitor()){
-        try{
-            $result = $con->query($sql);
-            $socios = $result->fetch_all(MYSQLI_ASSOC);
-            echo json_encode($socios);
-        }catch (mysqli_sql_exception $e) {
-             // echo $e;
-            header("HTTP/1.1 500 Internal Server Error");
-        }
-    }
-}
-function listaMonitores(){
-    $con = new Conexion();
-    // print_r($_GET);
-    if(isset($_GET['id_monitor'])){
-        $id_m = $_GET['id_monitor'];
-        $sql = "SELECT * FROM `monitor` WHERE 1 and id_m = $id_m;";
-    }else if(isset($_GET['curso'])){
-        $curso = $_GET['curso'];
-        $sql = "SELECT * FROM `monitor` WHERE 1 and curso_m like '$curso'";
-    }else if(isset($_GET['nombres'])){
-        $sql = "SELECT monitores.id, usuarios.nom, usuarios.apel1 FROM `monitores` INNER JOIN usuarios ON monitores.id_u = usuarios.id WHERE 1; ";
-    }
-    else{
-        $sql = "SELECT * FROM `monitores` INNER JOIN `usuarios` ON usuarios.id = monitores.id_u WHERE 1";
-    }
-    if(checkDirector() || checkMonitor()){
 
-        try{
-            // echo $sql;
-            $result = $con->query($sql);
-            // print_r($result);
-            $monitores = $result->fetch_all(MYSQLI_ASSOC);
-            echo json_encode($monitores);
-        }catch (mysqli_sql_exception $e) {
-            $e;
-            header("HTTP/1.1 406 Not Acceptable");
-        }
-    }else{
-        header("HTTP/1.1 401 Unauthorized");
-    }
-}
 
 function familiaresDelSocio($id_s = 0){
     $con = new Conexion();

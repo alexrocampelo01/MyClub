@@ -1,4 +1,7 @@
 
+body{
+  margin: 0;
+}
 main{
   background-color: red;
   height: auto;
@@ -40,7 +43,6 @@ main{
 }
 #filtros form{
   display: flex;
-  flex-direction: ;
   width: 100%;
   margin: 0px;
   background-color: aqua;
@@ -120,7 +122,7 @@ font-size: large;
   border-radius: 5px;
   border: none;
 }
-#butUser{
+#butCrearUser, #butModificarUser{
   margin: 10px;
   padding: 5px;
   border-radius: 5px;
@@ -144,5 +146,36 @@ font-size: large;
 }
 .campoInvalido{
   border: red 2px solid;
+}
+/*
+* ESTILOS PARA LA LISTA DE USUARIOS TABLAS
+*/
+#divListas{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: auto;
+  background-color: #4CAF50;
+  color: white;
+}
+table,th, td, tr{
+  border-collapse: collapse; 
+}
+#divListas th{
+  color: white;
+  padding: 10px;
+  background-color: rgba(32, 117, 64, 1);
+  border-right: 2px solid  #E2B122ff;
+  border-left: 2px solid  #E2B122ff;
+}
+#divListas td{
+  border-right: 2px solid  #E2B122ff;
+  border-left: 2px solid  #E2B122ff;
+  border-top: 2px solid  #E2B122ff;
+  border-bottom: 2px solid  #E2B122ff;
+  color: white;
+  padding: 10px;
 }
 
