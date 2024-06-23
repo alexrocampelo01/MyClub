@@ -6,7 +6,7 @@ require_once ('../php/permisos.php');
 require_once('conet.php');
 $con = new Conexion();
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-    if(checkDirector() || checkMonitor()){
+    if(checkDirector() || checkMonitor() || checkFamiliar() || checkSocio()){
         if(isset($_GET['filtro']) && isset($_GET['lista'])){
             $filtro = $_GET['filtro'];
             $lista = $_GET['lista'];

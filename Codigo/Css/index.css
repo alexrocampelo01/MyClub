@@ -11,45 +11,82 @@ body {
     border-radius: 5px;
     cursor: pointer;
 }
-.imagenInicial{
-    background-image: url('../../Img/logoMyclub.png');
-    width: 99%;
-    height: 50vh;
-}
 .explicion{
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
     background-color: rgba(16, 95, 46, 1);
     color: white;
-    width: auto;
 }
 .tituloExplicacion{
     width: 100%;
     background-color: rgb(232, 169, 106);
+    text-align: center;
 }
 .textoExplicacion{
     display: flex;
-    justify-content: space-between;
     flex-direction: row;
-    padding: 10px 20px;
+    padding: 10px;
     background-color: rgb(108, 106, 232);
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+
+}
+.divExplicacionParrafo{
+    width: 60%;
+}
+.divExplicacionImg{
+    width: 50%;
+}
+.divExplicacionImg img{
+    width: 80%;
+}
+.queHaceExplicaciones{
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    background-color: rgba(16, 95, 46, 1);
     color: white;
-    width: auto;
-
 }
-.textoExplicacion p{
-    width: 55%;
-    height: 60%;
-    background-color: rgb(17, 17, 39);
-
+.queHaceExplicacion{
+    width: 30%;
+    margin:1.5%;
+    background-color: green;
 }
-.textoExplicacionImg img{
-    width: 40%;
-    height: 40%;
-    background-color: rgb(17, 17, 39);
+.divQueHacParrafo{
+    align-items: center;
+    color: pink;
+    width: 100%;
+}
+.divQueHacerImg img{
+    width: 100%;
+}
+@media all and (width  < 650px){
+    .textoExplicacion{
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        background-color: pink;
+    }
+    .divExplicacionParrafo{
+        width: 100%;
+        margin: 10px;
+    }
+    .divExplicacionImg{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+    .queHaceExplicaciones{
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        text-align: center;
+        background-color: rgba(16, 95, 46, 1);
+        color: white;
+    }
+
 }
 /* 
 $old-gold: rgba(189, 166, 40, 1);
@@ -58,3 +95,4 @@ $dark-spring-green: rgba(32, 117, 64, 1);
 $dartmouth-green: rgba(16, 95, 46, 1); 
 $pakistan-green-2: rgba(0, 73, 28, 1); // mas oscuro
 */
+

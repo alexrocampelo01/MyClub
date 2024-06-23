@@ -47,15 +47,15 @@ function comprobarPermisos(){
 // director
 // monitor
 // socios 
-// padres
+// familiar
 function checkDirector(){
     return comprobarPermisos() == "director";
 }
 function checkMonitor(){
     return comprobarPermisos() == "monitor";
 }
-function checkPadres(){
-    return comprobarPermisos() == "padres";
+function checkFamiliar(){
+    return comprobarPermisos() == "familiar";
 }
 function checkSocio(){
     return comprobarPermisos() == "socios";

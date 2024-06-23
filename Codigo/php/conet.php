@@ -4,8 +4,8 @@
 
     private $host = "localhost";
     private $db = "myclub";
-    private $user = "myclub1";
-    private $pass = "myclub1";
+    private $user = "myclub";
+    private $pass = "myclub";
     public function __construct() {
         try {
             parent::__construct($this->host, $this->user, $this->pass, $this->db);

@@ -47,7 +47,7 @@ function recojerFormularioLog(){
     lanzarLogin(datosU);
 }
 async function lanzarLogin(dataForm){ //funciona 
-    fetch(`${urlLocal}usuarios.php`, {
+    fetch(`${urlApi}usuarios.php`, {
         method:'POST',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',

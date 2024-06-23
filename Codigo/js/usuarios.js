@@ -1,4 +1,28 @@
 
+document.addEventListener("DOMContentLoaded", function() {
+    // Tu código aquí se ejecutará tan pronto como el DOM esté completamente cargado
+    console.log("El DOM ha sido completamente cargado");
+    let butCrearUsario = document.querySelector('#crearUsuario');
+    butCrearUsario.addEventListener('click', crearUsuario);
+    function crearUsuario(){
+        console.log("crearUsuario");
+        //Limpiamos el formulario al crearz
+        let formulario = document.querySelector('#formularioUsuario');
+        console.log("FORMULARIO",formulario);
+        for (let i = 0; i < formulario.elements.length; i++) {
+            if (formulario.elements[i].type == "text" || formulario.elements[i].type == "textarea") {
+              formulario.elements[i].value = "";
+            } else if (formulario.elements[i].type == "checkbox" || formulario.elements[i].type == "radio") {
+              formulario.elements[i].checked = false;
+            } else if (formulario.elements[i].type == "number") {
+              formulario.elements[i].selectedIndex = 0;
+            } else if (formulario.elements[i].type == "date" || formulario.elements[i].type == "datetime-local") {
+                formulario.elements[i].selectedIndex = 0;
+              }
+          }
+        abrirModal();
+    }
+  });
 let butCrearUser = document.querySelector('#butCrearUser');
 butCrearUser.addEventListener('click', recojerFormularioUsuario); 
 let butModificarUser = document.querySelector('#butModificarUser');
@@ -10,15 +34,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     tipoUser.addEventListener('change', function() {
         // Aquí va el código que se ejecutará cuando cambie el valor del selector
-        console.log('El valor del selector ha cambiado a: ' + this.value);
         loadForm(this.value);
     });
 
     // Aquí va el código que se ejecutará cuando se cargue la página
-    console.log('La página ha cargado y el valor inicial del selector es: ' + tipoUser.value);
     loadForm(tipoUser.value);
 });
-function loadForm(tipoUser = ''){
+function loadForm(tipoUser = '', mode = '', data = ''){
     let rutaFomr = "";
     switch(tipoUser){
         case 'director':
@@ -46,8 +68,51 @@ function loadForm(tipoUser = ''){
         if(tipoUser == 'monitor'){
             listaNombresDirectore();
         }else if(tipoUser == 'familiar'){
-            console.log("familiar");
             listaNombresSocios();
+        }
+        //hacemos la carga dinamica al modificar
+        if(mode == "modificar" && data != ""){ // arreglar
+            console.log("modificar TIPO USARIO", tipoUser);
+            console.log("modificar", data);
+            switch(tipoUser){
+                case 'director':
+                    document.querySelector('#idRol').value = data.id_r;
+                    document.querySelector('#club').value = data.club;
+                    let fechaEleccion = new Date(data.fechaEleccion);
+                    let fechaFormateadaDir = fechaEleccion.toISOString().split('T')[0];
+                    document.querySelector('#fecha_elec').value = fechaFormateadaDir;
+                    break;
+                case 'monitor':
+                    document.querySelector('#idRol').value = data.id_r;
+                    document.querySelector('#curso_m').value = data.curso;
+                    console.log("dataDATA",data.carne_c);
+                    document.querySelector('#carne_conducir').checked = data.carne_c == 1 ? true : false;
+                    document.querySelector('#titulo_monitor').checked = data.titulo_m == 1 ? true : false;
+                    break;
+                case 'socio':
+                    document.querySelector('#idRol').value = data.id_r;
+                    document.querySelector('#curso').value = data.curso;
+                    document.querySelector('#colegio').value = data.colegio;
+                    let fechaNac = new Date(data.fechaNacimiento);
+                    let fechaFormateada = fechaNac.toISOString().split('T')[0];
+                    document.querySelector('#fechNac').value = fechaFormateada;
+                    let fechaInscrip = new Date(data.fechaInscrip);
+                    let fechaInscripFormateada = fechaInscrip.toISOString().split('T')[0];
+                    document.querySelector('#fecha_inscrip').value = fechaInscripFormateada;
+                    document.querySelector('#observaciones').value = data.observaciones;
+                    
+                    break;
+                case 'familiar':
+                    document.querySelector('#idRol').value = data.id_r;
+                    document.querySelector('#dir').value = data.direccion;
+                    document.querySelector('#loc').value = data.localidad;
+                    document.querySelector('#cp').value = data.cp;
+                    document.querySelector('#parentesco').value = data.parentesco;
+                    break;
+                default:
+                    console.log("no hay datos adicionales");
+                break;
+            }
         }
     });
 }
@@ -122,7 +187,6 @@ async function recojerFormularioUsuario(mode){
         tlf.classList.add('campoInvalido');
         invalidsInputs.push(tlf);
     }else{
-        console.log("tlf",tlf.value);
         datosU.tlf = tlf.value;
         tlf.classList.remove('campoInvalido');
         invalidsInputs.filter(input => input != tlf);
@@ -136,6 +200,7 @@ async function recojerFormularioUsuario(mode){
         correo.classList.remove('campoInvalido');
         invalidsInputs.filter(input => input != correo);
     }
+    let idUsu = document.querySelector('#idUsu').value;
     // comprueba si hay campos incorrectos
     let datosRol = await recojerFormularioRol(tipo_user.value);
     datosU.rol ={...datosRol};
@@ -143,11 +208,16 @@ async function recojerFormularioUsuario(mode){
     console.log("Formulario recojido",datosU);
     console.log("errores formulario",invalidsInputs);
     //buscamos los elemetos ocultos y los quitamos
-    let campos ocultos = invalidsInputs.filter(input => input.classList.contains('esconderNone'))
-    if(invalidsInputs.length == 0){
+    let camposOcultos = invalidsInputs.filter(input => input.classList.contains('esconderNone'));
+    let invalidosSinOcultos = invalidsInputs.filter(input => !camposOcultos.includes(input));
+    console.log("RESULTADO sin ocultos",invalidosSinOcultos);
+    
+    if(invalidosSinOcultos.length == 0){
         if(mode == "modificar"){
             // datosU.id = idU;
             console.log("modificar usuario",datosU);
+            datosU.id_u = idUsu;
+            lanzarModificar(datosU)
         }else{
             console.log("crear usuario",datosU);
             lanzarForm(datosU);
@@ -163,7 +233,6 @@ async function recojerFormularioUsuario(mode){
 }
 
 async function recojerFormularioRol(rol){ // arreglar
-    console.log("recojerFormularioRol");
     let datosAdicionales = {};
     datosAdicionales.tipeRol = rol;
     switch(rol){
@@ -186,17 +255,17 @@ async function recojerFormularioRol(rol){ // arreglar
                 fecha_elec.classList.remove('campoInvalido');
                 invalidsInputs.filter(input => input != fecha_elec);
             }
-            console.log("fecha", fecha_elec.value);
+            datosAdicionales.id_r = document.querySelector('#idRol').value;
             break;
         case 'monitor':
             datosAdicionales.id_d = document.querySelector('#director').value;
             datosAdicionales.curso_m = document.querySelector('#curso_m').value;
             datosAdicionales.carne_conducir = document.querySelector('#carne_conducir').value;
             datosAdicionales.titulo_monitor = document.querySelector('#titulo_monitor').value;
+            datosAdicionales.id_r = document.querySelector('#idRol').value;
             break;
         case 'socio':
             datosAdicionales.curso_s = document.querySelector('#curso').value;
-
             let colegio = document.querySelector('#colegio');
             if(colegio.value == ""){
                 colegio.classList.add('campoInvalido');
@@ -233,6 +302,7 @@ async function recojerFormularioRol(rol){ // arreglar
                 observaciones.classList.remove('campoInvalido');
                 invalidsInputs.filter(input => input != observaciones);
             }
+            datosAdicionales.id_r = document.querySelector('#idRol').value; //Aaaaaaaaaaaaaaaa
             break;
         case 'familiar':
             datosAdicionales.id_s = document.querySelector('#socio').value;
@@ -266,6 +336,7 @@ async function recojerFormularioRol(rol){ // arreglar
                 invalidsInputs.filter(input => input != cp);
             }
             datosAdicionales.parentesco = document.querySelector('#parentesco').value;
+            datosAdicionales.id_r = document.querySelector('#idRol').value;
             break;
         default:
             console.log("no hay datos adicionales");
@@ -320,6 +391,7 @@ async function lanzarForm(dataForm){ // arreglar
             if(dataForm.tipeRol == "usuario"){
                 idU =data;
                 console.log("usuario creado con exito");
+                cerrarModal();
                 location.reload(true);
             }else{
                 console.log("crado otro tipo de usuario", dataForm.tipeRol);
@@ -334,13 +406,13 @@ async function lanzarForm(dataForm){ // arreglar
 /*
 *MODIFICAR USUARIOS
 */
-function modificarUsuario(data){
+async function modificarUsuario(data){
     let infoUsuario = data[0];
     console.log("data MODIFICAR",infoUsuario);
-    console.log("CARGO EL FORMULARIO", infoUsuario.tipo_user);
+
     //Configuramos el formulario
     document.querySelector('#tipo_user').value = infoUsuario.tipo_user;
-    this.loadForm(infoUsuario.tipo_user);
+    await this.loadForm(infoUsuario.tipo_user, "modificar", infoUsuario);
     let label = document.querySelector("label[for='pass']").classList.add('esconderNone');
     document.querySelector('#pass').classList.add('esconderNone');
     butCrearUser.classList.add('esconderNone');
@@ -352,36 +424,68 @@ function modificarUsuario(data){
     document.querySelector('#apel2').value = infoUsuario.apel2;
     document.querySelector('#tlf').value = infoUsuario.tlf;
     document.querySelector('#correo').value = infoUsuario.correo;
-    //Rellenamos el formulario de rol
-    // datosAdicionales.id_d = document.querySelector('#director').value;
-    // datosAdicionales.curso_m = document.querySelector('#curso_m').value;
-    // datosAdicionales.carne_conducir = document.querySelector('#carne_conducir').value;
-    // datosAdicionales.titulo_monitor = document.querySelector('#titulo_monitor').value;
-    console.log("director DEFAULT",document.querySelector('#director').value);
-    console.log("director cargado",infoUsuario.id_d);
-    let selectorDirectores = document.querySelector('#director')
-    for (let i = 0; i < selectorDirectores.options.length; i++) {
-        if (selectorDirectores.options[i].value === infoUsuario.id_d) {
-            opcionEncontrada = true;
-            selectorDirectores.options[i].selected = true;
-            console.log("opcion encontrado", selectorDirectores.options[i]);
-            console.log("opcion encontrada", infoUsuario.id_d);
-            break;
-        }
-    }
+    document.querySelector('#idUsu').value = infoUsuario.id_u;
 
-    console.log("director DEFAULT",document.querySelector('#director').value);
-    console.log("director cargado",infoUsuario.id_d);
-    // let selectorDirectores = document.document.querySelector('#director')
-    // for (let i = 0; i < select.options.length; i++) {
-    //     if (select.options[i].value === infoUsuario.id_d) {
-    //         opcionEncontrada = true;
-    //         console.log("opcion encontrada", infoUsuario.id_d);
-    //         break;
-    //     }
-    // }
-    document.querySelector('#curso_m').value = infoUsuario.curso;
+    //Rellenamos el formulario de rol
+    console.log("infoUsuario",infoUsuario.tipo_user);
+
+
+
     
+}
+function lanzarModificar(dataForm){
+    console.log("datosUsusario",dataForm)
+    // console.log("webToken", sessionStorage.getItem('jwt'));
+    console.log("lanzar formMODIFICAR", dataForm.tipeform);
+    fetch(`${urlLocal}usuarios.php`, {
+        method:'PUT',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8',
+            'webToken' : sessionStorage.getItem('jwt')
+        },
+        body: JSON.stringify(dataForm),
+    })
+    .then(response => {
+        console.log("estatus MODIFICAR",response.status);
+            switch(response.status){
+                case 200:
+                    return response.text();
+                case 201:
+                    document.querySelector('#errores').innerHTML=`usuario modificado con exito`;
+                    return response.text();
+                case 404:
+                    document.querySelector('#errores').innerHTML=`Sql excepcion`;
+                    break;
+                case 406:
+                    console.log("usario ya usado");
+                    document.querySelector('#errores').innerHTML=`usuario o contaseñas incorrectos`;
+                    break;
+                case 401:
+                    console.log("no tienes permiso");
+                    document.querySelector('#errores').innerHTML=`no tienes permiso`;
+                    break;
+                default:
+                    document.querySelector('#errores').innerHTML=`error intentelo mas tarde`;
+                    console.log("defecto");
+                    break;
+            }
+    })
+    .then(data => {
+        console.log("THEN lanzarform",data);
+        if(data != undefined){
+            if(dataForm.tipeRol == "usuario"){
+                idU =data;
+                console.log("usuario modificado con exito");
+                cerrarModal();
+                cargarLista("socios");
+            }else{
+                console.log("crado otro tipo de usuario", dataForm.tipeRol);
+            }
+        }else{
+            console.log("no hay datos");
+        }
+    })
+
 }
 
 /*
@@ -431,6 +535,22 @@ function listaNombresSocios(){
             selecSocio.appendChild(option);
         });
     });
+}
+function infoSocioDeFamiliar(idSocio){
+    fetch(`${urlLocal}usuarios.php?lista=socios&id=${idSocio}`, {
+        method:'GET',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8',
+            'webToken' : sessionStorage.getItem('jwt'),
+        },
+    }).then(response => {
+        return response.json();
+    }).then(data => {     
+        console.log("info SOCIO FAMILAIR", data);
+        document.querySelector('#curso').value = data.curso;
+        return data;
+    });
+
 }
 
 function isFechaValida(d) {

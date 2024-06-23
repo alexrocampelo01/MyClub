@@ -14,7 +14,7 @@
         <div id="etiquetas">
             <ul>
               <li id="directores">Directores</li>
-              <li id="usuarios">Usuarios</li>
+              <!-- <li id="usuarios">Usuarios</li> -->
               <li id="monitores">Monitor</li>
               <li id="socios">Socios</li>
               <li id="familiares">Familiares</li>
@@ -22,7 +22,7 @@
             <!-- <a href="../html/Componentes/FiltrosTablas/FiltroFamiliar.html">Volver</a> -->
         </div>
         <div id="contenedorLista">
-            <div id="filtros">
+            <div id="filtros" style="display: none;">
                 <form>
                     <label for="tipeUser">Filtros</label>
                     <br>
@@ -46,8 +46,11 @@
             </div>
             <div id="divListas">
                 
+                
             </div>
-            <button id="crearUsuario">+</button>
+        </div>
+        <div id="footer">
+        
         </div>
     </main>
     <div id="modalUsuario" class="modalUsuario">
@@ -65,7 +68,7 @@
                 <label for="apel1">Primer apellido</label>
                 <input type="text" name="apel1" id="apel1">
 
-                <label for="apel2">Primer apellido</label>
+                <label for="apel2">Segundo apellido</label>
                 <input type="text" name="apel2" id="apel2">
 
                 <label for="correo">Correo electronico</label>
@@ -80,8 +83,10 @@
                     <option value="socio">Socio</option>
                     <option value="familiar">Familiar</option>
                 </select>
+                <input type="hidden" id="idUsu" value="">
+                <input type="hidden" id="idRol" value="">
                 <div id="formTipo">
-                    
+
                 </div>
             <!-- <span>
                 <input type="checkbox" name="leyDatos" id="leyDatos"><label> Autoriza ha el uso de estos datos</label>
@@ -89,18 +94,17 @@
             </span> -->
             <span id="butCrearUser">Crear Usuario</span>
             <span id="butModificarUser" class="esconderNone">Modificar Usuario</span>
+            <div id="errores">
+
+            </div>
         </form>
         <div id="zonaForm">
 
         </div>
-        <div id="errores">
 
-        </div>
     </div>
 </body>
 <script src="../js/cargaDinamica.js"></script>
-<script src="../js/listas.js"></script>
 <script src="../js/cargaDeListas.js"></script>
-<script src="../js/permisos.js"></script>
 <script src="../js/usuarios.js"></script>
 </html>

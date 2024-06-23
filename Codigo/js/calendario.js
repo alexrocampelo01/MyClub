@@ -1,5 +1,9 @@
 console.log("calendario.js");
 let elementDomListaActividades = document.querySelector('#ListaActividades');
+let butCrear = document.querySelector('#butCrear');
+butCrear.classList.remove('esconderNone');
+elementDomListaActividades.appendChild(butCrear);
+cambiosPorRol();
 
 let listaActividades = [];
 
@@ -141,46 +145,64 @@ function seleccionarDia(e){
         <div class="accionesActividad">
             <button idC="${actividad.id}" class="modificarAc">Modificar</button>
             <button idC="${actividad.id}" class="eliminarAc">Eliminar</button>
+            <button idC="${actividad.id}" class="infoAc">Información</button>
         </div>
       </div>
       `;
+
       // console.log(`creando lista`, divActividadLista);
       elementDomListaActividades.append(divActividadLista);
+      elementDomListaActividades.appendChild(butCrear);
       document.querySelectorAll('.modificarAc').forEach((element)=>{element.addEventListener('click', modificarActividadLoad);})
       document.querySelectorAll('.eliminarAc').forEach((element)=>{element.addEventListener('click', eliminarActividad);})
-
+      document.querySelectorAll('.infoAc').forEach((element)=>{element.addEventListener('click', modificarActividadLoad);})
+      cambiosPorRolActividad();
     })
   }
 }
+
 function modificarActividadLoad(e){
   console.log("modificar actividad", e.target.getAttribute('idc'));
   let activiadad = listaActividades.find(actividad => actividad.id == e.target.getAttribute('idc'));
-
-  // console.log("actividad", activiadad);
+  console.log("actividad", activiadad);
   // abromos el modal y lo modificamos
   abrirModal();
-  document.querySelector('#butCrearActividad').classList.add('ocultar');
-  document.querySelector('#butModificaActividad').classList.remove('ocultar');
+  document.querySelector('#butCrearActividad').classList.add('esconderNone');
+  document.querySelector('#butModificaActividad').classList.remove('esconderNone');
   //rellenamos los campos
   let monitor = document.querySelector('#monitor')
   let monitorSelect =  monitor.querySelector(`option[value="${activiadad.id_m}"]`);
-  monitorSelect.selected = true;
-  
+  if(monitorSelect != null){
+    monitorSelect.selected = true;
+  }
   document.querySelector('#titulo').value = activiadad.titulo;
   document.querySelector('#fechStart').value = activiadad.fechaHora_start;
   document.querySelector('#fechEnd').value = activiadad.fechaHora_end;
   document.querySelector('#lugar').value = activiadad.lugar;
   let curso = document.querySelector('#curso');
   let cursoSelect =  curso.querySelector(`option[value="${activiadad.curso_ac}"]`);
-  cursoSelect.selected = true;
-  console.log("curso", curso);
+  if(cursoSelect != null){
+    cursoSelect.selected = true;
+  }
+
   document.querySelector('#descripcion').value = activiadad.descripcion;
   document.querySelector('#material').value = activiadad.material;
-      //mirar como añadir curso y monitor selecionados !!!
-  //añadimos el evento
-  document.querySelector('#butModificaActividad').setAttribute('id_C', `${activiadad.id}`);
-  document.querySelector('#butModificaActividad').addEventListener('click', modificarActividad);
+  // Si es info no se puede modificar
+  if(e.target.classList.contains('infoAc')){ 
+    console.log("INFORMACION TARGET", e.target);
+    document.querySelector('#butModificaActividad').classList.add('esconderNone');
+    hacerNoEditableForm(true);
+  }else{
+    //añadimos el evento
+    hacerNoEditableForm(false); 
+    document.querySelector('#butModificaActividad').setAttribute('id_C', `${activiadad.id}`);
+    document.querySelector('#butModificaActividad').addEventListener('click', modificarActividad);
+
+  }
 }
+//si recive true no se puede editar
+//si recive false se puede editar
+
 function modificarActividad(e){ // validar formulario
   console.log("modificar actividad");
   let activiadad ={};
@@ -195,7 +217,7 @@ function modificarActividad(e){ // validar formulario
   activiadad.descripcion = document.querySelector('#descripcion').value;  
   activiadad.material = document.querySelector('#material').value;
   console.log("actividad", activiadad);
-  fetch(`${urlLocal}actividades.php`, {
+  fetch(`${urlApi}actividades.php`, {
       method:'PUT',
       headers: {
           'Content-Type': 'application/json;charset=utf-8',
@@ -224,6 +246,7 @@ function modificarActividad(e){ // validar formulario
   }).then(data => {     
       console.log(data);
       cerrarModal();
+      location.reload(); 
   });
 }
 function eliminarActividad(e){
@@ -232,7 +255,7 @@ function eliminarActividad(e){
   let confirmacion = confirm("¿Estas seguro de eliminar la actividad?");
   if(confirmacion){
   console.log("eliminar actividad");   
-  fetch(`${urlLocal}actividades.php?id=${id_actividad}`, {
+  fetch(`${urlApi}actividades.php?id=${id_actividad}`, {
     method:'DELETE',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
@@ -264,8 +287,8 @@ function convertirDateATextoSQL(fecha) {
 }
 
 async function getActividadesList(startDate, endDate){
-  // console.log(`[URL] ${urlLocal}actividades.php?lista=rangoFechas&filtro=${startDate},${endDate}`)
-  let listaActividades = fetch(`${urlLocal}actividades.php?lista=rangoFechas&filtro=${startDate},${endDate}`, {
+  // console.log(`[URL] ${urlApi}actividades.php?lista=rangoFechas&filtro=${startDate},${endDate}`)
+  let listaActividades = fetch(`${urlApi}actividades.php?lista=rangoFechas&filtro=${startDate},${endDate}`, {
       method:'GET',
       headers: {
         webToken: `${sessionStorage.getItem('jwt')}`,
@@ -318,7 +341,7 @@ function obtenerActividadesPorFecha(listaActividades, fecha) {
 
 function listaNombreMonitores(){
     let selecMonitores = document.querySelector('#monitor');
-    fetch(`${urlLocal}usuarios.php?lista=monitores&nombres`, {
+    fetch(`${urlApi}usuarios.php?lista=monitores&nombres`, {
         method:'GET',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -337,7 +360,42 @@ function listaNombreMonitores(){
         });
     });
 }
-
+function hacerNoEditableForm(editable){
+  if(editable){
+    document.querySelector('#monitor').disabled = true;
+    document.querySelector('#titulo').disabled = true;
+    document.querySelector('#fechStart').disabled = true;
+    document.querySelector('#fechEnd').disabled = true;
+    document.querySelector('#lugar').disabled = true;
+    document.querySelector('#curso').disabled = true;
+    document.querySelector('#descripcion').disabled = true;
+    document.querySelector('#material').disabled = true;
+  }else{
+    document.querySelector('#monitor').disabled = false;
+    document.querySelector('#titulo').disabled = false;
+    document.querySelector('#fechStart').disabled = false;
+    document.querySelector('#fechEnd').disabled = false;
+    document.querySelector('#lugar').disabled = false;
+    document.querySelector('#curso').disabled = false;
+    document.querySelector('#descripcion').disabled = false;
+    document.querySelector('#material').disabled = false;
+  }
+}
+async function cambiosPorRolActividad(){
+  let rol = await checkRol();
+  console.log("cambios por rol", rol);
+  if(rol == 'socio' || rol == 'familiar'){
+  document.querySelectorAll('.modificarAc').forEach((element)=>{element.classList.add('esconderNone');})
+  document.querySelectorAll('.eliminarAc').forEach((element)=>{element.classList.add('esconderNone');})
+  }
+}
+async function cambiosPorRol(){
+  let rol = await checkRol();
+  console.log("cambios por rol", rol);
+  if(rol == 'socio' || rol == 'familiar'){
+    document.querySelector('#butCrear').classList.add('esconderNone');
+  }
+}
 
 //CREAR ACTIVIDAD
 let btnCrearActividad = document.querySelector('#butCrearActividad');
@@ -347,8 +405,8 @@ let butModificaActividad = document.querySelector('#butModificaActividad');
 btnCrearActividad.addEventListener('click', modificarActividadLoad);
 
 function recojerFormActividad(){
-    document.querySelector('#butCrearActividad').classList.remove('ocultar');
-    document.querySelector('#butModificaActividad').classList.add('ocultar');
+    document.querySelector('#butCrearActividad').classList.remove('esconderNone');
+    document.querySelector('#butModificaActividad').classList.add('esconderNone');
     console.log("crear actividad");
     let activiadad ={};
     activiadad.id_m = document.querySelector('#monitor').value;
@@ -365,7 +423,7 @@ function recojerFormActividad(){
 function crearActividad(dataActividad){
     console.log("crear actividad", dataActividad);
     console.log("crear actividad JSON", JSON.stringify(dataActividad));
-    fetch(`${urlLocal}actividades.php`, {
+    fetch(`${urlApi}actividades.php`, {
         method:'POST',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -393,13 +451,32 @@ function crearActividad(dataActividad){
         }
     }).then(data => {     
         console.log(data);
+        location.reload();
         cerrarModal();
     });
 }
 
 // Crear la ventana  modal
-let butCrear = document.querySelector('#butCrear');
+butCrear = document.querySelector('#butCrear');
 butCrear.addEventListener('click', abrirModal);
+butCrear.addEventListener('click',prepararActividadNueva);
+
+function prepararActividadNueva(){
+  document.querySelector('#butCrearActividad').classList.remove('esconderNone');
+  document.querySelector('#butModificaActividad').classList.add('esconderNone');
+  let formulario = document.querySelector('#formActividad');
+  for (let i = 0; i < formulario.elements.length; i++) {
+    if (formulario.elements[i].type == "text" || formulario.elements[i].type == "textarea") {
+      formulario.elements[i].value = "";
+    } else if (formulario.elements[i].type == "checkbox" || formulario.elements[i].type == "radio") {
+      formulario.elements[i].checked = false;
+    } else if (formulario.elements[i].type == "number") {
+      formulario.elements[i].selectedIndex = 0;
+    } else if (formulario.elements[i].type == "date" || formulario.elements[i].type == "datetime-local") {
+        formulario.elements[i].selectedIndex = 0;
+      }
+  }
+};
 
 let spanCerrar = document.querySelector('#cerrarModal');
 spanCerrar.addEventListener('click', cerrarModal);

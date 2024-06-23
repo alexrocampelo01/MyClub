@@ -84,7 +84,21 @@ body{
   height: 500px;
   border: black solid 2px;
   background-color: #4CAF50;
-  overflow: auto;
+  position: relative;
+}
+#butCrear{
+  position: absolute; 
+  bottom: 20px; 
+  right: 20px; 
+  border-radius: 100%; 
+  background-color: #E2B122ff; 
+  width: 5vh;
+  height: 5vh;
+  border-style: none;
+}
+input:disabled, select:disabled, textarea:disabled {
+  background-color: white;
+  color: black;
 }
 .actividadLista{
   margin: 10px;
@@ -120,7 +134,7 @@ body{
   background-color: rgba(32, 117, 64, 1);
 }
 .informacionActividad{
-  width: 75%;
+  width: 70%;
 }
 .accionesActividad{
   display: flex;
@@ -185,6 +199,7 @@ body{
   border-radius: 5px;
   border: none;
 }
+
 #butCrearActividad, #butModificaActividad {
     margin: 10px;
     padding: 5px;
@@ -203,8 +218,6 @@ body{
   text-align: left;
   font-size: large;
 }
-.ocultar{
-  display: none;
-}
+
 /* Estilo para enlaces no visitados */
 

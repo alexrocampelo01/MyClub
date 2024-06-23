@@ -1,38 +1,49 @@
 
 body{
   margin: 0;
+  background-color: #4CAF50;
 }
 main{
-  background-color: red;
-  height: auto;
+  height: 60vh;
+  background-color: #4CAF50;
+  margin: 0;
 }
 #etiquetas{
-  background-color: coral;
-  height: 50px;
+  background-color: #4CAF50;
+  height: auto;
+  padding-top: 10px;
 }
 #etiquetas ul{
   display: flex;
   flex-direction: row;
   align-items: flex-end;
   list-style: none;
-  padding: 0px;
-  height: 50px;
-  background-color: #4CAF50;
+  margin: 0px;
+  height: auto;
 }
 #etiquetas li{
-  margin: 0px 0px 0px 2px;
+  margin: 0px 0px 0px 5px;
   padding: 5px;
   border-radius: 10px 10px 0px 0px;
   background-color: coral;
   color: white;
   height: 20px;
+  cursor: pointer;
+}
+.botonModificar, .botonEliminar{
+  background-color: #E2B122ff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
 }
 #contenedorLista{
   display: flex;
   flex-direction: column;
   width: 100%;
-  background-color: greenyellow;
-  height: 200px;
+  height: 100%;
+  border-top: 5px solid #E2B122ff;
 }
 #filtros{
   display: flex;
@@ -47,22 +58,15 @@ main{
   margin: 0px;
   background-color: aqua;
 }
-.lista{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    border: 5px solid black;
-}
 #crearUsuario{
-  position: fixed; /* Hace que el botón se mantenga en una posición específica incluso cuando se desplaza la página */
+  position: absolute; /* Hace que el botón se mantenga en una posición específica incluso cuando se desplaza la página */
   bottom: 20px; /* Posiciona el botón a 20px del borde inferior de la página */
   right: 20px; /* Posiciona el botón a 20px del borde derecho de la página */
   border-radius: 100%; /* Añade esquinas redondeadas al botón */
-  background-color: #4CAF50; /* Establece el color de fondo del botón */
-  width: 4%;
-  height: 5%;
+  background-color: #E2B122ff; /* Establece el color de fondo del botón */
+  width: 4vw;
+  height: 5vh;
+  border-style: none;
 }
 #visualizarLista{
   background-color: yellow;
@@ -153,10 +157,11 @@ font-size: large;
 #divListas{
   display: flex;
   flex-direction: column;
+  position: relative;
   align-items: center;
-  justify-content: center;
+  /* justify-content: center; */
   width: 100%;
-  height: auto;
+  height: 100%;
   background-color: #4CAF50;
   color: white;
 }
