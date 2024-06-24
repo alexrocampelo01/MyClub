@@ -6,6 +6,9 @@ let urlCalendario = `${urlHtml}calendarioEjemplo.html`;
 let urlListas = `${urlHtml}listas.html`;
 let urlIndex = `${urlHtml}index.html`;
 console.log("urlIndex", urlIndex);
+console.log("urlLogin", urlLogin);
+console.log("urlCalendario", urlCalendario);
+console.log("urlListas", urlListas);
 let divCabecera = document.getElementById("cabecera");
 let urlCabecera = "../html/header.html";
 fetch(urlCabecera)    
