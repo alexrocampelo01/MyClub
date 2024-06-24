@@ -2,6 +2,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
+    background-color: rgba(16, 95, 46, 1);
 }
 .profile button {
     background-color: rgba(32, 117, 64, 1);
@@ -18,21 +19,33 @@ body {
     color: white;
 }
 .tituloExplicacion{
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
-    background-color: rgb(232, 169, 106);
     text-align: center;
+    
+}
+.tituloExplicacion h1{
+    width: 80%;
+    color: white;
+    text-align: center;
+    border-radius: 2vh;
+    border: 3px solid #E2B122ff;
+    background-color: #E2B122ff;
 }
 .textoExplicacion{
     display: flex;
     flex-direction: row;
     padding: 10px;
-    background-color: rgb(108, 106, 232);
+    background-color: rgba(16, 95, 46, 1);
     text-align: center;
     align-items: center;
     justify-content: center;
 
 }
 .divExplicacionParrafo{
+    font-size: large;
     width: 60%;
 }
 .divExplicacionImg{
@@ -40,6 +53,22 @@ body {
 }
 .divExplicacionImg img{
     width: 80%;
+}
+.tituloQueHace{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+
+}
+.tituloQueHace h1{
+    width: 80%;
+    text-align: center;
+    color: white;
+    border-radius: 2vh;
+    border: 3px solid #E2B122ff;
+    background-color: #E2B122ff;
 }
 .queHaceExplicaciones{
     display: flex;
@@ -51,11 +80,15 @@ body {
 .queHaceExplicacion{
     width: 30%;
     margin:1.5%;
-    background-color: green;
+    min-width: 200px;
+    padding: 5px;
+    background-color: rgba(16, 95, 46, 1);
+    border-radius: 2vh;
+    border: 3px solid #E2B122ff;
 }
-.divQueHacParrafo{
+.divQueHacerParrafo{
     align-items: center;
-    color: pink;
+    color: white;
     width: 100%;
 }
 .divQueHacerImg img{
@@ -66,7 +99,7 @@ body {
         display: flex;
         flex-wrap: wrap;
         flex-direction: row;
-        background-color: pink;
+        background-color: rgba(16, 95, 46, 1);
     }
     .divExplicacionParrafo{
         width: 100%;
@@ -82,9 +115,20 @@ body {
         display: flex;
         flex-wrap: wrap;
         flex-direction: row;
-        text-align: center;
         background-color: rgba(16, 95, 46, 1);
+    }
+    .queHaceExplicacion{
+        width: 100%;
+        margin:1.5%;
+        background-color: rgba(16, 95, 46, 1);
+    }
+    .divQueHacerParrafo{
+        align-items: center;
         color: white;
+        width: 100%;
+    }
+    .divQueHacerImg img{
+        width: 100%;
     }
 
 }
