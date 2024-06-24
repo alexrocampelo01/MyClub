@@ -72,7 +72,30 @@ function cargarLista(tipoLista){
         let butCrearUsuario = document.createElement('button');
         butCrearUsuario.id = 'crearUsuario';
         butCrearUsuario.textContent = '+';
-        butCrearUsuario.addEventListener('click', abrirModal);
+        document.addEventListener("DOMContentLoaded", function() {
+            // Tu código aquí se ejecutará tan pronto como el DOM esté completamente cargado
+            console.log("El DOM ha sido completamente cargado");
+            let butCrearUsario = document.querySelector('#crearUsuario');
+            butCrearUsario.addEventListener('click', crearUsuario);
+            function crearUsuario(){
+                console.log("crearUsuario");
+                //Limpiamos el formulario al crearz
+                let formulario = document.querySelector('#formularioUsuario');
+                console.log("FORMULARIO",formulario);
+                for (let i = 0; i < formulario.elements.length; i++) {
+                    if (formulario.elements[i].type == "text" || formulario.elements[i].type == "textarea") {
+                      formulario.elements[i].value = "";
+                    } else if (formulario.elements[i].type == "checkbox" || formulario.elements[i].type == "radio") {
+                      formulario.elements[i].checked = false;
+                    } else if (formulario.elements[i].type == "number") {
+                      formulario.elements[i].selectedIndex = 0;
+                    } else if (formulario.elements[i].type == "date" || formulario.elements[i].type == "datetime-local") {
+                        formulario.elements[i].selectedIndex = 0;
+                      }
+                  }
+                abrirModal();
+            }
+          });
         divTabla.appendChild(butCrearUsuario);
     });
     }

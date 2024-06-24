@@ -217,7 +217,7 @@ async function recojerFormularioUsuario(mode){
             // datosU.id = idU;
             console.log("modificar usuario",datosU);
             datosU.id_u = idUsu;
-            lanzarModificar(datosU)
+            lanzarModificar(datosU);
         }else{
             console.log("crear usuario",datosU);
             lanzarForm(datosU);
@@ -352,7 +352,7 @@ async function lanzarForm(dataForm){ // arreglar
     console.log("datosUsusario",dataForm)
     // console.log("webToken", sessionStorage.getItem('jwt'));
     console.log("lanzar form", dataForm.tipeform);
-    await fetch(`${urlLocal}usuarios.php`, {
+    await fetch(`${urlApi}usuarios.php`, {
         method:'POST',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -387,11 +387,11 @@ async function lanzarForm(dataForm){ // arreglar
     })
     .then(data => {
         console.log("THEN lanzarform",data);
+        cerrarModal();
         if(data != undefined){
             if(dataForm.tipeRol == "usuario"){
                 idU =data;
                 console.log("usuario creado con exito");
-                cerrarModal();
                 location.reload(true);
             }else{
                 console.log("crado otro tipo de usuario", dataForm.tipeRol);
@@ -437,7 +437,7 @@ function lanzarModificar(dataForm){
     console.log("datosUsusario",dataForm)
     // console.log("webToken", sessionStorage.getItem('jwt'));
     console.log("lanzar formMODIFICAR", dataForm.tipeform);
-    fetch(`${urlLocal}usuarios.php`, {
+    fetch(`${urlApi}usuarios.php`, {
         method:'PUT',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -472,11 +472,11 @@ function lanzarModificar(dataForm){
     })
     .then(data => {
         console.log("THEN lanzarform",data);
+        cerrarModal();
         if(data != undefined){
             if(dataForm.tipeRol == "usuario"){
                 idU =data;
                 console.log("usuario modificado con exito");
-                cerrarModal();
                 cargarLista("socios");
             }else{
                 console.log("crado otro tipo de usuario", dataForm.tipeRol);
@@ -494,7 +494,7 @@ function lanzarModificar(dataForm){
 function listaNombresDirectore(){
     let selectorDirectores = document.querySelector('#director');
     console.log("selectorDirectores",selectorDirectores);
-    fetch(`${urlLocal}usuarios.php?lista=directores&nombre`, {
+    fetch(`${urlApi}usuarios.php?lista=directores&nombre`, {
         method:'GET',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -517,7 +517,7 @@ function listaNombresDirectore(){
 function listaNombresSocios(){
     let selecSocio = document.querySelector('#socio');
     console.log("selecSocio",selecSocio);
-    fetch(`${urlLocal}usuarios.php?lista=socios&nombres`, {
+    fetch(`${urlApi}usuarios.php?lista=socios&nombres`, {
         method:'GET',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -537,7 +537,7 @@ function listaNombresSocios(){
     });
 }
 function infoSocioDeFamiliar(idSocio){
-    fetch(`${urlLocal}usuarios.php?lista=socios&id=${idSocio}`, {
+    fetch(`${urlApi}usuarios.php?lista=socios&id=${idSocio}`, {
         method:'GET',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
