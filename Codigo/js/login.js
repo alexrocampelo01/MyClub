@@ -81,7 +81,7 @@ async function lanzarLogin(dataForm){ //funciona
         sessionStorage.setItem('jwt', jwt);
         document.querySelector('#errores').innerHTML=' logeado con exito';
         //configuaraciones por haber logeado
-        window.location.href = "http://localhost/Myclub/Codigo/html/CalendarioEjemplo.html";
+        window.location.href = `${urlCalendario}`;
         document.querySelector('#errores').innerHTML=' logeado con exito';
         return data;
     })
