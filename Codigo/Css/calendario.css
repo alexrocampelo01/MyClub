@@ -4,14 +4,14 @@ body{
 }
 #contenido {
   width: 100%;
-  height: 100%;
+  height: 100vh;
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
   background-color: #4CAF50;
 }
 #divContenidoCalendario{
-  width: 60%;
+  width: 50%;
   height: 500px;
   background-color: #4CAF50;
   border: black solid 2px;
@@ -80,11 +80,12 @@ body{
 }
 
 #ListaActividades {
-  width: 39%;
+  width: 49%;
   height: 500px;
   border: black solid 2px;
   background-color: #4CAF50;
   position: relative;
+  overflow: auto;
 }
 #butCrear{
   position: absolute; 

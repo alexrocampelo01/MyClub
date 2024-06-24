@@ -1,4 +1,3 @@
-
 body{
   margin: 0;
   background-color: #4CAF50;
@@ -40,6 +39,7 @@ main{
 }
 #contenedorLista{
   display: flex;
+  overflow: auto;
   flex-direction: column;
   width: 100%;
   height: 100%;
@@ -59,7 +59,7 @@ main{
   background-color: aqua;
 }
 #crearUsuario{
-  position: absolute; /* Hace que el botón se mantenga en una posición específica incluso cuando se desplaza la página */
+  position: fixed; /* Hace que el botón se mantenga en una posición específica incluso cuando se desplaza la página */
   bottom: 20px; /* Posiciona el botón a 20px del borde inferior de la página */
   right: 20px; /* Posiciona el botón a 20px del borde derecho de la página */
   border-radius: 100%; /* Añade esquinas redondeadas al botón */

@@ -72,6 +72,7 @@ function cargarLista(tipoLista){
         let butCrearUsuario = document.createElement('button');
         butCrearUsuario.id = 'crearUsuario';
         butCrearUsuario.textContent = '+';
+        butCrearUsuario.addEventListener('click', abrirModal);
         divTabla.appendChild(butCrearUsuario);
     });
     }
